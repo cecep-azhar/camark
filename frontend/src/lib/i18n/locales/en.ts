@@ -25,25 +25,9 @@ export const en: Dictionary = {
     required: 'Required'
   },
   shell: {
-    workspace: 'Workspace',
     theme: 'Theme',
     lightTheme: 'Light Theme',
-    darkTheme: 'Dark Theme',
-    openNav: 'Open navigation menu',
-    closeNav: 'Close navigation',
-    closeMenuBackdrop: 'Close menu backdrop',
-    mobileNav: 'Mobile Navigation',
-    sidebar: 'Sidebar',
-    expandSidebar: 'Expand sidebar',
-    collapseSidebar: 'Collapse sidebar',
-    minimize: 'Minimize',
-    maximize: 'Maximize',
-    close: 'Close',
-    closeWindow: 'Close CAMark',
-    closeConfirm: 'Are you sure you want to close CAMark?',
-    signedOut: 'Signed out',
-    signOutConfirm: 'Are you sure you want to sign out?',
-    signOutTitle: 'Sign Out'
+    darkTheme: 'Dark Theme'
   },
   nav: {
     workspace: 'Files & Folders',

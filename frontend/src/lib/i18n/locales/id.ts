@@ -23,25 +23,9 @@ export const id: Dictionary = {
     required: 'Wajib diisi'
   },
   shell: {
-    workspace: 'Ruang Kerja',
     theme: 'Tema',
     lightTheme: 'Tema Terang',
-    darkTheme: 'Tema Gelap',
-    openNav: 'Buka menu navigasi',
-    closeNav: 'Tutup navigasi',
-    closeMenuBackdrop: 'Tutup latar menu',
-    mobileNav: 'Navigasi Mobile',
-    sidebar: 'Bilah Samping',
-    expandSidebar: 'Buka bilah samping',
-    collapseSidebar: 'Ciutkan bilah samping',
-    minimize: 'Kecilkan',
-    maximize: 'Perbesar',
-    close: 'Tutup',
-    closeWindow: 'Tutup CAMark',
-    closeConfirm: 'Apakah Anda yakin ingin menutup CAMark?',
-    signedOut: 'Berhasil keluar',
-    signOutConfirm: 'Apakah Anda yakin ingin keluar?',
-    signOutTitle: 'Keluar'
+    darkTheme: 'Tema Gelap'
   },
   nav: {
     workspace: 'Berkas & Direktori',

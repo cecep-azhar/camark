@@ -102,18 +102,6 @@
       }
     }).catch((e) => console.warn('Failed to listen to open-file event:', e));
 
-    // Watch query param changes
-    $effect(() => {
-      const mode = page.url.searchParams.get('mode');
-      if (mode === 'vault') {
-        isVaultMode = true;
-        loadVaultDocs();
-      } else if (mode === 'files') {
-        isVaultMode = false;
-        loadDirectory(workspacePath || '.');
-      }
-    });
-
     // Default load current directory workspace
     if (page.url.searchParams.get('mode') === 'vault') {
       isVaultMode = true;
@@ -208,16 +196,11 @@
   let saveTimeout: any;
   function autoSave() {
     if (!currentFilePath) return;
-    const path = currentFilePath;
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
       isSaving = true;
       try {
-        if (path.startsWith('vault://')) {
-          await saveVaultDoc();
-        } else {
-          await invoke('workspace_write_file', { filePath: path, content: rawMarkdown });
-        }
+        await invoke('workspace_write_file', { filePath: currentFilePath, content: rawMarkdown });
       } catch (e) {
         console.error('Save failed:', e);
       } finally {

@@ -9,7 +9,7 @@
   height={size}
   viewBox="0 0 1334 946"
   fill="currentColor"
-  class="shrink-0 {mode === 'white' ? 'text-white' : mode === 'light' ? 'text-black' : 'text-cyan-400'} {className}"
+  class="shrink-0 {mode === 'white' ? 'text-white' : mode === 'light' ? 'text-black' : 'text-[#ff0000]'} {className}"
   xmlns="http://www.w3.org/2000/svg"
 >
   <!-- Left Segment -->
