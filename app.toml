@@ -1,0 +1,72 @@
+[app]
+name = "CAMark"
+slug = "camark"
+bundle_id = "com.fathforce.camark"
+version = "0.1.0"
+accent_color = "cyan"
+error_prefix = "CMRK"
+description = "High-Performance, Local-First & Zero-Knowledge Markdown Studio"
+brand = "Fathforce"
+
+[window]
+title = "CAMark — Markdown Studio"
+width = 1300
+height = 850
+min_width = 900
+min_height = 600
+
+[security]
+master_password_required = true
+profile_pin_enabled = true
+
+[modules]
+sample_slice_enabled = true
+ai_assistant_enabled = true
+pro_licensing_enabled = true
+updater_enabled = true
+crash_reporting_enabled = true
+backup_restore_enabled = true
+
+[roles]
+default_role = "member"
+allowed_roles = ["owner", "partner", "member", "child"]
+
+[[menus]]
+key = "workspace"
+label = "Workspace"
+href = "/workspace"
+icon = "folder-tree"
+description = "Native Filesystem Tree & Markdown Workspace"
+
+[[menus]]
+key = "editor"
+label = "Markdown Studio"
+href = "/"
+icon = "file-edit"
+description = "CodeMirror 6 Editor & Live Preview"
+
+[[menus]]
+key = "vault"
+label = "Encrypted Vault"
+href = "/vault"
+icon = "lock"
+description = "SQLCipher Zero-Knowledge Encrypted Notes"
+
+[[menus]]
+key = "ai_copilot"
+label = "AI Copilot"
+href = "/copilot"
+icon = "sparkles"
+description = "AI Writing Assistant, Table Formatter & Translator"
+
+[billing]
+enabled = true
+product_code = "CAMARK"
+gcc_base_url = "https://gcc.cecepazhar.com"
+offline_days = 7
+refresh_hours = 6
+currencies = ["IDR", "USD"]
+
+[[billing.public_keys]]
+kid = "gcc-2026-10"
+ed25519 = "O8+tQ5qQ/pQpP9P9p9p9P9P9p9P9P9P9p9P9P9P9P9M="

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-export-document-html"
+description = "Enables the export_document_html command without any pre-configured scope."
+commands.allow = ["export_document_html"]
+
+[[permission]]
+identifier = "deny-export-document-html"
+description = "Denies the export_document_html command without any pre-configured scope."
+commands.deny = ["export_document_html"]
