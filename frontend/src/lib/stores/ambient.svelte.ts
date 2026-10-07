@@ -1,5 +1,6 @@
 export type AmbientMode = 'app-accent' | 'solid' | 'rgb-cycle' | 'aurora';
 export type AmbientEffect = 'static' | 'breathing' | 'wave';
+export type AvatarGlowEffect = 'comet-beam' | 'dual-photons' | 'chroma-ring';
 
 export interface AmbientConfig {
   enabled: boolean;
@@ -9,6 +10,8 @@ export interface AmbientConfig {
   intensity: number; // 0.1 to 1.0 (opacity)
   blurRadius: number; // 8 to 40 px
   speedSec: number; // 2 to 15 s
+  avatarGlowEnabled: boolean;
+  avatarGlowEffect: AvatarGlowEffect;
 }
 
 const STORAGE_KEY = 'camark-ambient-lighting-v1';
@@ -20,7 +23,9 @@ const DEFAULT_CONFIG: AmbientConfig = {
   effect: 'breathing',
   intensity: 0.65,
   blurRadius: 20,
-  speedSec: 4
+  speedSec: 4,
+  avatarGlowEnabled: true,
+  avatarGlowEffect: 'comet-beam'
 };
 
 function loadStoredConfig(): AmbientConfig {
@@ -79,6 +84,12 @@ function createAmbientStore() {
     },
     setSpeedSec(speedSec: number) {
       update({ speedSec: Math.max(1, Math.min(20, speedSec)) });
+    },
+    setAvatarGlowEnabled(avatarGlowEnabled: boolean) {
+      update({ avatarGlowEnabled });
+    },
+    setAvatarGlowEffect(avatarGlowEffect: AvatarGlowEffect) {
+      update({ avatarGlowEffect });
     },
     resetDefaults() {
       config = { ...DEFAULT_CONFIG };
