@@ -24,6 +24,7 @@
   import CommandPalette from '$lib/components/CommandPalette.svelte';
   import { getPalette, openPalette, closePalette } from '$lib/stores/commandPalette.svelte';
   import { getLayoutState } from '$lib/stores/layoutState.svelte';
+  import AmbientGlow from '$lib/components/AmbientGlow.svelte';
 
   let isCollapsed = $state(false);
   let isVaultUnlocked = $state(true); // Open directly without vault lockscreen by default
@@ -309,10 +310,14 @@
         </div>
       </header>
 
-      <!-- Viewport Body -->
-      <main class="flex-1 overflow-hidden relative">
-        {@render children?.()}
-      </main>
+      <!-- Viewport Body with Outer Ambient Halo Underglow -->
+      <div class="flex-1 min-w-0 flex flex-col relative overflow-hidden">
+        <AmbientGlow defaultAccent="#06b6d4" />
+
+        <main class="flex-1 overflow-hidden relative z-10">
+          {@render children?.()}
+        </main>
+      </div>
     </div>
 
     <!-- Modals and Overlays -->

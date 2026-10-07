@@ -10,8 +10,9 @@
   import { listProfiles, saveProfile, type ProfileRecord } from '$lib/api/profiles';
   import { exportEncryptedBackup, importEncryptedBackup } from '$lib/api/prefs';
   import { APP_VERSION } from '$lib/appInfo';
+  import AmbientSettingsCard from '$lib/components/AmbientSettingsCard.svelte';
 
-  type SettingsTab = 'security' | 'profiles' | 'ai' | 'backup' | 'about';
+  type SettingsTab = 'security' | 'appearance' | 'profiles' | 'ai' | 'backup' | 'about';
   let currentTab = $state<SettingsTab>('security');
 
   // Password state
@@ -153,6 +154,12 @@
         Security & Vault
       </button>
       <button
+        onclick={() => (currentTab = 'appearance')}
+        class="w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors {currentTab === 'appearance' ? 'bg-indigo-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-900'}"
+      >
+        Appearance & Ambient
+      </button>
+      <button
         onclick={() => (currentTab = 'profiles')}
         class="w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-colors {currentTab === 'profiles' ? 'bg-indigo-600 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-900'}"
       >
@@ -232,6 +239,10 @@
               </button>
             </div>
           </div>
+        </div>
+      {:else if currentTab === 'appearance'}
+        <div class="space-y-6">
+          <AmbientSettingsCard defaultAccent="#06b6d4" appName="CAMark" />
         </div>
       {:else if currentTab === 'profiles'}
         <div class="space-y-6">
