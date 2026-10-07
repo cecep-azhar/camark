@@ -247,16 +247,14 @@
 
         <!-- Right: Actions, Language, Theme & Window Controls -->
         <div class="flex items-center gap-2 no-drag shrink-0">
-          <!-- Ask AI Button -->
+          <!-- Ask / Hana AI Button -->
           <button
             type="button"
             onclick={() => toggleAiChat()}
-            class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors text-xs font-medium"
+            class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-300 transition-colors text-xs font-medium cursor-pointer"
             title={t('ai.askAi')}
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+            <span class="text-xs">🌸</span>
             <span>{t('ai.askAi')}</span>
           </button>
 
@@ -343,6 +341,22 @@
 
     <!-- Modals and Overlays -->
     <AiChatPanel isOpen={aiChat.open} onClose={() => closeAiChat()} />
+
+    <!-- Floating Action Button: Hana AI in bottom right corner -->
+    {#if !aiChat.open}
+      <button
+        type="button"
+        onclick={() => toggleAiChat()}
+        class="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-3.5 py-2 rounded-full bg-neutral-900/90 hover:bg-neutral-800 text-neutral-100 border border-neutral-700/80 shadow-2xl shadow-black/60 hover:scale-105 active:scale-95 transition-all text-xs font-semibold cursor-pointer group"
+        title="Hana AI (Markdown Co-Pilot)"
+        aria-label="Open Hana AI"
+      >
+        <span class="text-rose-500 group-hover:rotate-12 transition-transform text-sm">🌸</span>
+        <span>Hana AI</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      </button>
+    {/if}
+
     <CommandPalette />
     <NotificationCenter />
 

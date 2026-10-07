@@ -263,7 +263,21 @@ export const id: Dictionary = {
     security: 'Keamanan & Profil',
     ai: 'Asisten AI'
   },
+  ambient: {
+    title: 'Pencahayaan Ambient & Aura (PRO)',
+    subtitle: 'Efek pencahayaan pendaran dinamis di sekeliling kartu kerja dan profil.',
+    underglow: 'Ambient Underglow',
+    cardGlow: 'Work Area Card Outer Glow',
+    avatarHalo: 'Avatar Profile Halo',
+    diffusedHalo: 'Diffused Halo',
+    neonHairline: 'Neon Hairline',
+    chromaBeam: 'Chroma Border Beam',
+    active: 'Aktif',
+    inactive: 'Nonaktif'
+  },
   ai: {
+    hanaTitle: 'Hana AI 🌸',
+    hanaTagline: 'Asisten AI Markdown tenang, presisi & siap membantu',
     minimizeBubble: 'Kecilkan ke pojok',
     minimize: 'Kecilkan',
     floatingCardMode: 'Mode Kartu Mengambang',
@@ -272,7 +286,7 @@ export const id: Dictionary = {
     closeAssistant: 'Tutup Asisten AI',
     inputPlaceholder: 'Tanyakan sesuatu atau perbaiki format markdown...',
     send: 'Kirim',
-    askAi: 'Ask AI'
+    askAi: 'Hana AI'
   },
   editor: {
     exportHtmlTitle: 'Export Dokumen ke Standalone HTML',

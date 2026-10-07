@@ -52,10 +52,10 @@
     <div class="fixed bottom-4 right-4 z-50 animate-in fade-in duration-150">
       <button
         onclick={() => (isMinimized = false)}
-        class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 font-medium text-xs border border-indigo-400/30 transition-transform hover:scale-105"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-xl shadow-rose-600/30 font-medium text-xs border border-rose-400/30 transition-transform hover:scale-105 cursor-pointer"
       >
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Asisten AI Aktif</span>
+        <span>Hana AI Aktif 🌸</span>
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
         </svg>
@@ -71,8 +71,11 @@
       <!-- Panel Header -->
       <div class="px-4 py-3 border-b border-neutral-800/80 bg-neutral-950/60 flex items-center justify-between select-none">
         <div class="flex items-center gap-2">
-          <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/50"></div>
-          <h3 class="text-xs font-bold text-white tracking-wide">Asisten AI Writing</h3>
+          <div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></div>
+          <h3 class="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+            <span>Hana AI</span>
+            <span class="text-xs">🌸</span>
+          </h3>
         </div>
 
         <div class="flex items-center gap-1">

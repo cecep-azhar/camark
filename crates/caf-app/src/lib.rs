@@ -21,9 +21,9 @@
 )]
 
 mod commands;
+pub mod exporter;
 pub mod fs_workspace;
 pub mod vault_docs;
-pub mod exporter;
 mod window;
 
 fn normalize_cli_path(arg: &str, cwd: Option<&str>) -> Option<String> {
@@ -51,7 +51,13 @@ fn normalize_cli_path(arg: &str, cwd: Option<&str>) -> Option<String> {
     };
 
     if resolved.exists() {
-        Some(resolved.canonicalize().unwrap_or(resolved).to_string_lossy().to_string())
+        Some(
+            resolved
+                .canonicalize()
+                .unwrap_or(resolved)
+                .to_string_lossy()
+                .to_string(),
+        )
     } else {
         Some(resolved.to_string_lossy().to_string())
     }
@@ -65,7 +71,9 @@ fn url_decode(s: &str) -> String {
             let h1 = bytes.next().unwrap_or(b'0');
             let h2 = bytes.next().unwrap_or(b'0');
             let hex_str = [h1, h2];
-            if let Ok(byte_val) = u8::from_str_radix(std::str::from_utf8(&hex_str).unwrap_or("00"), 16) {
+            if let Ok(byte_val) =
+                u8::from_str_radix(std::str::from_utf8(&hex_str).unwrap_or("00"), 16)
+            {
                 result.push(byte_val as char);
             }
         } else if b == b'+' {
@@ -131,6 +139,35 @@ pub fn run_with_start(start: std::time::Instant) {
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
+
+            #[cfg(target_os = "linux")]
+            {
+                // Fix for non-Debian distros (Fedora/Arch/RHEL): tauri-plugin-updater hardcodes
+                // /etc/ssl/certs/ca-certificates.crt which doesn't exist on Fedora. Sanitize it
+                // so child shells/processes don't inherit a poisoned SSL_CERT_FILE.
+                if let Ok(cert) = std::env::var("SSL_CERT_FILE") {
+                    if !std::path::Path::new(&cert).exists() {
+                        let valid_ca = [
+                            "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+                            "/etc/pki/tls/cert.pem",
+                            "/etc/ssl/ca-bundle.pem",
+                            "/etc/ssl/cert.pem",
+                        ]
+                        .into_iter()
+                        .find(|p| std::path::Path::new(p).exists());
+
+                        if let Some(valid) = valid_ca {
+                            unsafe {
+                                std::env::set_var("SSL_CERT_FILE", valid);
+                            }
+                        } else {
+                            unsafe {
+                                std::env::remove_var("SSL_CERT_FILE");
+                            }
+                        }
+                    }
+                }
+            }
 
             #[cfg(target_os = "linux")]
             {

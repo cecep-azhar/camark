@@ -265,7 +265,21 @@ export const en: Dictionary = {
     security: 'Security & Profiles',
     ai: 'AI Assistant'
   },
+  ambient: {
+    title: 'Ambient Lighting & Aura (PRO)',
+    subtitle: 'Dynamic aura and glowing effects around the work area card and profile avatar.',
+    underglow: 'Ambient Underglow',
+    cardGlow: 'Work Area Card Outer Glow',
+    avatarHalo: 'Avatar Profile Halo',
+    diffusedHalo: 'Diffused Halo',
+    neonHairline: 'Neon Hairline',
+    chromaBeam: 'Chroma Border Beam',
+    active: 'Active',
+    inactive: 'Inactive'
+  },
   ai: {
+    hanaTitle: 'Hana AI 🌸',
+    hanaTagline: 'Calm, sharp & actionable Markdown AI Assistant',
     minimizeBubble: 'Minimize to bubble',
     minimize: 'Minimize',
     floatingCardMode: 'Floating Card Mode',
@@ -274,7 +288,7 @@ export const en: Dictionary = {
     closeAssistant: 'Close AI Assistant',
     inputPlaceholder: 'Ask something or refine markdown format...',
     send: 'Send',
-    askAi: 'Ask AI'
+    askAi: 'Hana AI'
   },
   editor: {
     exportHtmlTitle: 'Export Document to Standalone HTML',
