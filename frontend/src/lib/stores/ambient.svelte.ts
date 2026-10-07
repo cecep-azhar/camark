@@ -1,6 +1,7 @@
 export type AmbientMode = 'app-accent' | 'solid' | 'rgb-cycle' | 'aurora';
 export type AmbientEffect = 'static' | 'breathing' | 'wave';
 export type AvatarGlowEffect = 'comet-beam' | 'dual-photons' | 'chroma-ring';
+export type CardGlowStyle = 'diffused-halo' | 'neon-border' | 'chroma-beam';
 
 export interface AmbientConfig {
   enabled: boolean;
@@ -12,6 +13,8 @@ export interface AmbientConfig {
   speedSec: number; // 2 to 15 s
   avatarGlowEnabled: boolean;
   avatarGlowEffect: AvatarGlowEffect;
+  cardGlowEnabled: boolean;
+  cardGlowStyle: CardGlowStyle;
 }
 
 const STORAGE_KEY = 'camark-ambient-lighting-v1';
@@ -25,7 +28,9 @@ const DEFAULT_CONFIG: AmbientConfig = {
   blurRadius: 20,
   speedSec: 4,
   avatarGlowEnabled: true,
-  avatarGlowEffect: 'comet-beam'
+  avatarGlowEffect: 'comet-beam',
+  cardGlowEnabled: true,
+  cardGlowStyle: 'diffused-halo'
 };
 
 function loadStoredConfig(): AmbientConfig {
@@ -90,6 +95,12 @@ function createAmbientStore() {
     },
     setAvatarGlowEffect(avatarGlowEffect: AvatarGlowEffect) {
       update({ avatarGlowEffect });
+    },
+    setCardGlowEnabled(cardGlowEnabled: boolean) {
+      update({ cardGlowEnabled });
+    },
+    setCardGlowStyle(cardGlowStyle: CardGlowStyle) {
+      update({ cardGlowStyle });
     },
     resetDefaults() {
       config = { ...DEFAULT_CONFIG };

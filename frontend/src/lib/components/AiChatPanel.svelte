@@ -65,8 +65,8 @@
     <!-- Floating non-destructive AI Card overlay in the bottom right corner -->
     <div
       class="fixed z-50 flex flex-col bg-neutral-900/95 backdrop-blur-xl border border-neutral-700/80 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden transition-all duration-200 {isFullHeight
-        ? 'inset-y-3 right-3 w-[420px]'
-        : 'bottom-4 right-4 w-[390px] h-[520px] max-h-[80vh]'}"
+        ? 'top-[calc(3.5rem+env(safe-area-inset-top,0px))] bottom-3 right-3 w-[420px]'
+        : 'bottom-4 right-4 w-[390px] h-[520px] max-h-[calc(100vh-4.5rem-env(safe-area-inset-top,0px))]'}"
     >
       <!-- Panel Header -->
       <div class="px-4 py-3 border-b border-neutral-800/80 bg-neutral-950/60 flex items-center justify-between select-none">

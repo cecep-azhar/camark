@@ -25,6 +25,8 @@
   import { getPalette, openPalette, closePalette } from '$lib/stores/commandPalette.svelte';
   import { getLayoutState } from '$lib/stores/layoutState.svelte';
   import AmbientGlow from '$lib/components/AmbientGlow.svelte';
+  import { getAmbientStore } from '$lib/stores/ambient.svelte';
+  import { getPro } from '$lib/stores/pro.svelte';
 
   let isCollapsed = $state(false);
   let isVaultUnlocked = $state(true); // Open directly without vault lockscreen by default
@@ -36,6 +38,25 @@
   const toasts = $derived(getToasts());
   const palette = getPalette();
   const layoutState = getLayoutState();
+  const ambient = getAmbientStore();
+  const pro = getPro();
+
+  const cardBorderClass = $derived.by(() => {
+    if (!ambient.config.enabled || !ambient.config.cardGlowEnabled || !pro.isPro) {
+      return 'border-t border-neutral-200 dark:border-neutral-800 md:border-l';
+    }
+
+    if (ambient.config.cardGlowStyle === 'neon-border') {
+      return 'border-t border-cyan-400 dark:border-cyan-400 md:border-l shadow-[inset_0_0_8px_rgba(6,182,212,0.15)]';
+    }
+
+    if (ambient.config.cardGlowStyle === 'chroma-beam') {
+      return 'border-t border-cyan-400/50 dark:border-cyan-400/40 md:border-l';
+    }
+
+    // diffused-halo
+    return 'border-t border-cyan-400/30 dark:border-cyan-400/25 md:border-l';
+  });
 
   const navItems = $derived(getNavItems());
   const settingsItem = $derived(settingsNavItem());
@@ -311,10 +332,10 @@
       </header>
 
       <!-- Viewport Body with Outer Ambient Halo Underglow -->
-      <div class="flex-1 min-w-0 flex flex-col relative overflow-hidden">
+      <div class="flex-1 min-w-0 flex flex-col relative overflow-visible">
         <AmbientGlow defaultAccent="#06b6d4" />
 
-        <main class="flex-1 overflow-hidden relative z-10">
+        <main class="flex-1 overflow-hidden relative z-10 bg-white dark:bg-[#161616] {cardBorderClass} md:rounded-tl-xl transition-colors duration-150">
           {@render children?.()}
         </main>
       </div>
