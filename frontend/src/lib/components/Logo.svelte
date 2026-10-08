@@ -12,55 +12,51 @@
   xmlns="http://www.w3.org/2000/svg"
 >
   <defs>
-    <linearGradient id="cyanGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="symbolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#22D3EE" />
       <stop offset="100%" stop-color="#06B6D4" />
     </linearGradient>
-    <linearGradient id="whiteGradLogo" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="100%" stop-color="#E2E8F0" />
-    </linearGradient>
   </defs>
 
-  <!-- Outer Badge Container -->
-  <rect
-    x="76"
-    y="128"
-    width="360"
-    height="256"
-    rx="36"
-    fill={mode === 'white' ? 'none' : mode === 'light' ? '#F1F5F9' : '#0F172A'}
-    fill-opacity={mode === 'white' ? '0' : mode === 'light' ? '1' : '0.85'}
-    stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0891B2' : 'url(#cyanGradLogo)'}
-    stroke-width="20"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
+  <g fill="none">
+    <!-- Document Badge / Markdown Frame Container -->
+    <rect
+      x="88"
+      y="132"
+      width="336"
+      height="248"
+      rx="28"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0891B2' : 'url(#symbolGrad)'}
+      stroke-width="26"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
 
-  <!-- Bold 'M' (Markdown Glyph) -->
-  <path
-    d="M128 320 V192 L188 252 L248 192 V320"
-    fill="none"
-    stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0891B2' : 'url(#cyanGradLogo)'}
-    stroke-width="24"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
+    <!-- Bold 'M' Glyph -->
+    <path
+      d="M136 324 L136 200 L192 256 L248 200 L248 324"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0891B2' : '#22D3EE'}
+      stroke-width="26"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
 
-  <!-- Downward Arrow (Markdown Standard) -->
-  <path
-    d="M344 192 V316"
-    fill="none"
-    stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0F172A' : 'url(#whiteGradLogo)'}
-    stroke-width="24"
-    stroke-linecap="round"
-  />
-  <path
-    d="M296 272 L344 320 L392 272"
-    fill="none"
-    stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0F172A' : 'url(#whiteGradLogo)'}
-    stroke-width="24"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
+    <!-- Downward Arrow -->
+    <line
+      x1="336"
+      y1="200"
+      x2="336"
+      y2="294"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0F172A' : (mode === 'dark' ? '#FFFFFF' : '#06B6D4')}
+      stroke-width="26"
+      stroke-linecap="round"
+    />
+    <path
+      d="M296 264 L336 304 L376 264"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0F172A' : (mode === 'dark' ? '#FFFFFF' : '#06B6D4')}
+      stroke-width="26"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
 </svg>

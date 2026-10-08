@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
   import { listen } from '@tauri-apps/api/event';
+  import { open } from '@tauri-apps/plugin-dialog';
   import { EditorView, basicSetup } from 'codemirror';
   import { markdown } from '@codemirror/lang-markdown';
   import { oneDark } from '@codemirror/theme-one-dark';
@@ -321,7 +322,7 @@
     invoke<string | null>('get_initial_file_path')
       .then(async (path) => {
         if (path) {
-          viewMode = 'preview';
+          viewMode = 'split';
           showFileTree = false;
           layoutState.hideSidebar = true;
           const parts = path.split('/');
@@ -334,7 +335,7 @@
     // Listen for single instance open-file events
     listen<string>('open-file', (event) => {
       if (event.payload) {
-        viewMode = 'preview';
+        viewMode = 'split';
         showFileTree = false;
         layoutState.hideSidebar = true;
         const parts = event.payload.split('/');
@@ -424,6 +425,38 @@
     }
   }
 
+  async function navigateUp() {
+    if (workspacePath === '.' || !workspacePath) {
+      // Already at root or relative root, attempt to query canonical parent or keep dot
+      return;
+    }
+    const cleanPath = workspacePath.replace(/\/+$/, '');
+    const lastSlash = cleanPath.lastIndexOf('/');
+    if (lastSlash === -1) {
+      await loadDirectory('.');
+    } else if (lastSlash === 0) {
+      await loadDirectory('/');
+    } else {
+      const parent = cleanPath.substring(0, lastSlash);
+      await loadDirectory(parent);
+    }
+  }
+
+  async function openWorkspaceFolder() {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Pilih Folder Workspace',
+      });
+      if (selected && typeof selected === 'string') {
+        await loadDirectory(selected);
+      }
+    } catch (e) {
+      console.warn('Gagal memilih folder:', e);
+    }
+  }
+
   async function openFile(node: FileNode) {
     if (node.is_dir) return;
     try {
@@ -431,17 +464,27 @@
       currentFilePath = node.path;
       currentDocTitle = node.name;
       rawMarkdown = content;
+      if (viewMode === 'preview') {
+        viewMode = 'split';
+      }
+      await tick();
       if (editorView) {
         editorView.dispatch({
           changes: { from: 0, to: editorView.state.doc.length, insert: content },
         });
+        editorView.focus();
       }
       renderMarkdown(content);
 
+      // Don't override workspacePath if opened file is already inside current workspacePath
       const lastSlash = node.path.lastIndexOf('/');
       if (lastSlash > 0) {
         const parentDir = node.path.substring(0, lastSlash);
-        if (parentDir !== workspacePath) {
+        const isInsideWorkspace =
+          workspacePath !== '.' &&
+          (node.path === workspacePath ||
+            node.path.startsWith(workspacePath.endsWith('/') ? workspacePath : `${workspacePath}/`));
+        if (!isInsideWorkspace && parentDir !== workspacePath) {
           loadDirectory(parentDir);
         }
       }
@@ -635,7 +678,7 @@
   }
 </script>
 
-<div class="h-full flex flex-col bg-white dark:bg-[#161616] text-neutral-800 dark:text-neutral-200 overflow-hidden font-sans select-none relative">
+<div class="h-full flex flex-col bg-white dark:bg-[#161616] text-neutral-800 dark:text-neutral-200 overflow-hidden font-sans relative">
   <!-- Sleek Studio Toolbar Bar (h-12 / 48px) -->
   <header class="h-12 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-[#121212]/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between z-10 shrink-0 no-print">
     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -780,6 +823,39 @@
           </button>
         </div>
       </div>
+
+      {#if !isVaultMode}
+        <!-- Breadcrumb / Active Folder Bar with Parent and Open Folder actions -->
+        <div class="px-2.5 py-1.5 border-b border-neutral-200 dark:border-neutral-800/80 bg-neutral-100/50 dark:bg-neutral-900/40 flex items-center justify-between gap-1 text-[11px] font-mono">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1" title={workspacePath}>
+            <button
+              onclick={navigateUp}
+              disabled={workspacePath === '.' || workspacePath === '/'}
+              class="p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 disabled:opacity-30 disabled:pointer-events-none transition-colors shrink-0"
+              title="Naik ke Folder Parent (..)"
+              aria-label="Parent Directory"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+            </button>
+            <span class="truncate text-neutral-700 dark:text-neutral-300 font-medium">
+              {workspacePath === '.' ? './ (Workspace)' : workspacePath.split('/').filter(Boolean).pop() || '/'}
+            </span>
+          </div>
+
+          <button
+            onclick={openWorkspaceFolder}
+            class="px-1.5 py-0.5 rounded text-[10px] bg-neutral-200/70 hover:bg-neutral-300/80 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 transition-colors shrink-0 flex items-center gap-1"
+            title="Pilih Folder Lain..."
+          >
+            <svg class="w-3 h-3 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+            </svg>
+            <span>Buka...</span>
+          </button>
+        </div>
+      {/if}
 
       <!-- Scrollable File / Vault Tree -->
       <div class="flex-1 overflow-y-auto p-2 space-y-0.5 text-xs font-mono scrollbar-none">

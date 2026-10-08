@@ -12,7 +12,7 @@ name = "camarkctl"
 path = "src/main.rs"
 
 [dependencies]
-caf-core = { path = "../caf-core", version = "=0.1.2" }
+caf-core = { path = "../caf-core", version = "=0.1.3" }
 clap.workspace = true
 serde.workspace = true
 serde_json.workspace = true

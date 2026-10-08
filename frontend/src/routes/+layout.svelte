@@ -378,17 +378,6 @@
                 <span class="truncate">{item.label}</span>
               </a>
             {/each}
-            <a
-              href={settingsItem.href}
-              onclick={() => (mobileDrawerOpen = false)}
-              title={settingsItem.label}
-              class="px-2.5 py-2 rounded-lg flex items-center gap-3 transition-colors {isActive(settingsItem.href) ? 'bg-neutral-200/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white font-medium' : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/40 hover:text-neutral-900 dark:hover:text-white'}"
-            >
-              <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={settingsItem.path} />
-              </svg>
-              <span class="truncate">{settingsItem.label}</span>
-            </a>
           </nav>
         </div>
 
@@ -458,28 +447,6 @@
               </span>
             </a>
           {/each}
-
-          <div class="pt-2 my-2 border-t border-neutral-200/60 dark:border-neutral-800/60"></div>
-
-          <!-- Settings Destination -->
-          <a
-            href={settingsItem.href}
-            title={isCollapsed ? settingsItem.label : ''}
-            aria-current={isActive(settingsItem.href) ? 'page' : undefined}
-            class="relative px-2.5 py-2 rounded-lg flex items-center gap-3 transition-colors overflow-hidden {isActive(settingsItem.href) ? 'bg-neutral-200/80 dark:bg-neutral-800/80 text-neutral-900 dark:text-white font-medium' : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/50 dark:hover:bg-neutral-800/40 hover:text-neutral-900 dark:hover:text-white'}"
-          >
-            {#if isActive(settingsItem.href)}
-              <span class="absolute -left-2 top-1.5 bottom-1.5 w-[3px] rounded-r bg-cyan-500" aria-hidden="true"></span>
-            {/if}
-            <div class="w-[20px] h-[20px] flex items-center justify-center shrink-0">
-              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d={settingsItem.path} />
-              </svg>
-            </div>
-            <span class="truncate whitespace-nowrap transition-all duration-150 {isCollapsed ? 'opacity-0 w-0 pointer-events-none hidden' : 'opacity-100 min-w-0'}">
-              {settingsItem.label}
-            </span>
-          </a>
         </nav>
 
         <!-- Sidebar Footer with ProfileMenu & Active Avatar Halo -->
