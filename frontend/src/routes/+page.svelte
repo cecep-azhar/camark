@@ -18,6 +18,8 @@
   import FileTreeNode from '$lib/components/FileTreeNode.svelte';
   import MarkdownFormatToolbar from '$lib/components/MarkdownFormatToolbar.svelte';
   import ContextualAiActionBar from '$lib/components/ContextualAiActionBar.svelte';
+  import PresentationModal from '$lib/components/PresentationModal.svelte';
+  import OutlineDrawer from '$lib/components/OutlineDrawer.svelte';
   import type { FileNode } from '$lib/types/fileTree';
   import {
     formatMarkdownTable,
@@ -50,6 +52,8 @@
 
   // Zen & Focus Mode
   let isZenMode = $state<boolean>(false);
+  let isPresentationOpen = $state<boolean>(false);
+  let isOutlineOpen = $state<boolean>(false);
 
   // Text selection & AI Copilot Action Bar
   let selectedText = $state<string>('');
@@ -248,6 +252,28 @@
     selectedText = '';
     selectionRange = null;
     editorView.focus();
+  }
+
+  function handleJumpToHeading(heading: { line: number; anchor: string }) {
+    if (editorView) {
+      const targetLine = Math.min(Math.max(1, heading.line), editorView.state.doc.lines);
+      const linePos = editorView.state.doc.line(targetLine).from;
+      editorView.dispatch({
+        selection: { anchor: linePos },
+        scrollIntoView: true,
+      });
+      editorView.focus();
+    }
+    if (previewElement) {
+      const allHeadings = Array.from(previewElement.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+      const target = allHeadings.find((el) => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        return text.includes(heading.anchor.replace(/-/g, ' '));
+      });
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 
   onMount(() => {
@@ -905,7 +931,10 @@
         <MarkdownFormatToolbar
           {editorView}
           {isZenMode}
+          {isOutlineOpen}
           onToggleZen={handleToggleZen}
+          onToggleOutline={() => (isOutlineOpen = !isOutlineOpen)}
+          onTogglePresentation={() => (isPresentationOpen = true)}
           onFormatDocumentTable={handleFormatDocumentTable}
         />
 
@@ -942,7 +971,23 @@
         {@html renderedHtml}
       </section>
     {/if}
+
+    <!-- Live Document Outline Drawer -->
+    <OutlineDrawer
+      isOpen={isOutlineOpen && !isZenMode}
+      {rawMarkdown}
+      onJumpToHeading={handleJumpToHeading}
+      onClose={() => (isOutlineOpen = false)}
+    />
   </div>
+
+  <!-- Fullscreen Presentation Slides Modal (PRO) -->
+  <PresentationModal
+    isOpen={isPresentationOpen}
+    {rawMarkdown}
+    docTitle={currentDocTitle}
+    onClose={() => (isPresentationOpen = false)}
+  />
 
   <!-- Sleek Status Bar in Card Footer -->
   <footer class="h-7 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-[#111111] px-3 sm:px-4 flex items-center justify-between text-[11px] font-mono text-neutral-500 dark:text-neutral-400 z-10 shrink-0 select-none no-print">

@@ -27,16 +27,24 @@ pub mod vault_docs;
 mod window;
 
 fn normalize_cli_path(arg: &str, cwd: Option<&str>) -> Option<String> {
-    let trimmed = arg.trim();
-    if trimmed.is_empty() || trimmed.starts_with('-') {
+    let raw = arg.trim().trim_matches('"').trim_matches('\'');
+    if raw.is_empty() || raw.starts_with('-') {
         return None;
     }
 
     // Strip file:// schema if passed from desktop environment or file manager
-    let decoded = if let Some(stripped) = trimmed.strip_prefix("file://") {
-        url_decode(stripped)
+    let decoded = if let Some(stripped) = raw.strip_prefix("file://") {
+        let path_part = stripped.strip_prefix("localhost").unwrap_or(stripped);
+        url_decode(path_part)
+    } else if raw.contains('%') {
+        let dec = url_decode(raw);
+        if std::path::Path::new(&dec).exists() {
+            dec
+        } else {
+            raw.to_string()
+        }
     } else {
-        trimmed.to_string()
+        raw.to_string()
     };
 
     let path = std::path::Path::new(&decoded);

@@ -12,11 +12,22 @@
   interface Props {
     editorView?: EditorView | null;
     isZenMode: boolean;
+    isOutlineOpen: boolean;
     onToggleZen: () => void;
+    onToggleOutline: () => void;
+    onTogglePresentation: () => void;
     onFormatDocumentTable: () => void;
   }
 
-  let { editorView, isZenMode, onToggleZen, onFormatDocumentTable }: Props = $props();
+  let {
+    editorView,
+    isZenMode,
+    isOutlineOpen,
+    onToggleZen,
+    onToggleOutline,
+    onTogglePresentation,
+    onFormatDocumentTable,
+  }: Props = $props();
 
   function applyBold() {
     if (editorView) wrapSelection(editorView, '**', '**', 'teks tebal');
@@ -284,8 +295,31 @@
     </button>
   </div>
 
-  <!-- Right: Zen Mode Switch -->
-  <div class="flex items-center gap-1">
+  <!-- Right: Outline, Presentation & Zen Mode Controls -->
+  <div class="flex items-center gap-1.5 shrink-0">
+    <!-- Document Outline Drawer Toggle -->
+    <button
+      type="button"
+      onclick={onToggleOutline}
+      class="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors {isOutlineOpen ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-[#1f1f28] text-neutral-400 hover:text-white'}"
+      title="Tampilkan / Sembunyikan Struktur Dokumen (Outline)"
+    >
+      <span>📑</span>
+      <span class="hidden sm:inline">Outline</span>
+    </button>
+
+    <!-- Presentation / Slideshow Toggle -->
+    <button
+      type="button"
+      onclick={onTogglePresentation}
+      class="px-2 py-0.5 rounded text-[11px] font-bold flex items-center gap-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/40 hover:from-amber-500/30 hover:to-orange-500/30 transition-all shadow-xs"
+      title="Mode Presentasi / Slideshow Layar Penuh (PRO)"
+    >
+      <span>📽️</span>
+      <span>Presentasi</span>
+    </button>
+
+    <!-- Zen Mode Switch -->
     <button
       type="button"
       onclick={onToggleZen}
@@ -296,7 +330,7 @@
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M3 12h1m16 0h1m-9-9v1m0 16v1"></path>
       </svg>
-      <span>{isZenMode ? 'Zen Mode Aktif' : 'Zen Mode'}</span>
+      <span>{isZenMode ? 'Zen Aktif' : 'Zen'}</span>
     </button>
   </div>
 </div>

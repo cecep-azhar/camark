@@ -239,6 +239,26 @@
           <span class="text-[11px] font-mono hidden md:inline">SQLCipher Vault</span>
         </div>
 
+        <!-- Pro Edition Status Pill -->
+        {#if pro.isPro}
+          <a
+            href="/settings?tab=pro"
+            class="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 shadow-xs hover:bg-amber-500/25 transition-colors"
+            title="CAMark Pro Edition Aktif"
+          >
+            <span>★</span>
+            <span>PRO</span>
+          </a>
+        {:else}
+          <a
+            href="/settings?tab=pro"
+            class="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-neutral-400 bg-neutral-800 hover:text-white border border-neutral-700 transition-colors"
+            title="Aktifkan Lisensi Pro"
+          >
+            <span>★ Pro</span>
+          </a>
+        {/if}
+
         <!-- Quick Hana AI Trigger Pill -->
         <button
           type="button"
