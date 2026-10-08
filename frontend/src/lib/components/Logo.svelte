@@ -7,21 +7,48 @@
 <svg
   width={size}
   height={size}
-  viewBox="0 0 1334 946"
-  fill="currentColor"
-  class="shrink-0 {mode === 'white' ? 'text-white' : mode === 'light' ? 'text-black' : 'text-[#ff0000]'} {className}"
+  viewBox="0 0 512 512"
+  class="shrink-0 {className}"
   xmlns="http://www.w3.org/2000/svg"
 >
-  <!-- Left Segment -->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M581 0L0 301V644L581 945V546L421 473L581 399V0ZM529 86L52 332V613L529 859V574L308 473L529 371V86Z"
-  />
-  <!-- Right Segment -->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M753 0L1334 301V644L753 945V546L913 473L753 399V0ZM805 86L1282 332V613L805 859V574L1026 473L805 371V86Z"
-  />
+  <!-- Folded Document Frame & Bold Code Tag -->
+  <g fill="none">
+    <path
+      d="M128 88 L304 88 L384 168 L384 424 L128 424 Z"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0A0A0C' : '#06B6D4'}
+      stroke-width="28"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M304 88 L304 168 L384 168"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0A0A0C' : '#06B6D4'}
+      stroke-width="28"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <polyline
+      points="206,260 166,298 206,336"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0A0A0C' : '#22D3EE'}
+      stroke-width="28"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <polyline
+      points="306,260 346,298 306,336"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0A0A0C' : '#22D3EE'}
+      stroke-width="28"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <line
+      x1="272"
+      y1="262"
+      x2="240"
+      y2="334"
+      stroke={mode === 'white' ? '#FFFFFF' : mode === 'light' ? '#0A0A0C' : '#FFFFFF'}
+      stroke-width="28"
+      stroke-linecap="round"
+    />
+  </g>
 </svg>
