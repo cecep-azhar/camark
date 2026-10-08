@@ -14,7 +14,7 @@ button, input, textarea, a, select, [role="button"], .no-drag {
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Scrollable but without a visible bar (session tab strip, sidebar nav). */
+/* Scrollable but without a visible bar (tab strip, sidebar nav). */
 @utility scrollbar-none {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -35,6 +35,22 @@ button, input, textarea, a, select, [role="button"], .no-drag {
   color-scheme: light;
 }
 
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-pt-header {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+.safe-pb-nav {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
 html.dark {
   --bg-app: #0a0a0a;
   --bg-surface: #171717;
@@ -42,4 +58,287 @@ html.dark {
   --text-primary: #ededed;
   --text-secondary: #a3a3a3;
   color-scheme: dark;
+}
+
+/* ========================================================
+   CAMark Pro Markdown Typography & Preview Styles
+   ======================================================== */
+
+.markdown-preview {
+  color: #d4d4d8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  color: #fafafa;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.markdown-preview h1 {
+  font-size: 1.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.5rem;
+}
+
+.markdown-preview h2 {
+  font-size: 1.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.35rem;
+}
+
+.markdown-preview h3 {
+  font-size: 1.2rem;
+}
+
+.markdown-preview h4 {
+  font-size: 1.05rem;
+}
+
+.markdown-preview p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-preview strong {
+  color: #f4f4f5;
+  font-weight: 600;
+}
+
+.markdown-preview em {
+  color: #e4e4e7;
+}
+
+.markdown-preview a {
+  color: #22d3ee;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.markdown-preview a:hover {
+  color: #67e8f9;
+  text-decoration: underline;
+}
+
+.markdown-preview hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 2rem 0;
+}
+
+/* Blockquote: Sleek modern border with cyan highlight */
+.markdown-preview blockquote {
+  margin: 1.25rem 0;
+  padding: 0.6rem 1.25rem;
+  border-left: 3px solid #06b6d4;
+  background: rgba(6, 182, 212, 0.04);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #a1a1aa;
+  font-style: normal;
+}
+
+.markdown-preview blockquote p {
+  margin: 0.35rem 0;
+}
+
+/* Lists */
+.markdown-preview ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.markdown-preview ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.markdown-preview li {
+  margin: 0.35rem 0;
+}
+
+.markdown-preview li input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.markdown-preview li input[type="checkbox"]:checked {
+  background-color: #06b6d4;
+  border-color: #06b6d4;
+}
+
+.markdown-preview li input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 0.12rem;
+  width: 0.25rem;
+  height: 0.5rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Inline Code */
+.markdown-preview :not(pre) > code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85em;
+  padding: 0.15rem 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.35rem;
+  color: #22d3ee;
+}
+
+/* Code Block Wrapper with Header Bar */
+.code-block-wrapper {
+  margin: 1.25rem 0;
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.65rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  user-select: none;
+}
+
+.code-lang-pill {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.35rem;
+}
+
+.code-copy-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a1a1aa;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.code-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fafafa;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.code-copy-btn.copied {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.code-block-wrapper code {
+  color: #e4e4e7;
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* Modern Rounded Zebra Tables */
+.markdown-table-wrapper {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.markdown-preview th {
+  background: rgba(6, 182, 212, 0.08);
+  color: #22d3ee;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.markdown-preview td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #d4d4d8;
+}
+
+.markdown-preview tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-preview tr:hover td {
+  background: rgba(6, 182, 212, 0.04);
+}
+
+/* KaTeX Math Styling */
+.markdown-preview .katex-display {
+  margin: 1.25rem 0;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-preview .katex {
+  font-size: 1.05em;
+  color: #e0f2fe;
 }
