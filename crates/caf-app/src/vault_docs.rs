@@ -83,7 +83,10 @@ pub async fn save_document(
         .map_err(|e| e.to_string())?
 }
 
-fn save_document_sync(input: VaultDocInput, caller_profile_id: &str) -> Result<VaultDocument, String> {
+fn save_document_sync(
+    input: VaultDocInput,
+    caller_profile_id: &str,
+) -> Result<VaultDocument, String> {
     let conn = db::open().map_err(|e| e.to_string())?;
     let doc_id = input.id.unwrap_or_else(|| {
         format!(
@@ -105,7 +108,13 @@ fn save_document_sync(input: VaultDocInput, caller_profile_id: &str) -> Result<V
             tags = excluded.tags,
             rev = vault_documents.rev + 1,
             updated_at = datetime('now');",
-        [&doc_id, &input.title, &input.content, &tags_json, caller_profile_id],
+        [
+            &doc_id,
+            &input.title,
+            &input.content,
+            &tags_json,
+            caller_profile_id,
+        ],
     )
     .map_err(|e| e.to_string())?;
 

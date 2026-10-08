@@ -304,10 +304,11 @@ pub fn scrub_text(text: &str) -> (String, usize) {
 }
 
 /// Preview context for current session with given privacy level
-pub fn preview_context_for_current_session(level: PrivacyLevel) -> Result<ContextPayload, CatermError> {
-    let session = crate::session::get_current_session().unwrap_or_else(|_| {
-        crate::session::Session::new("default", "member")
-    });
+pub fn preview_context_for_current_session(
+    level: PrivacyLevel,
+) -> Result<ContextPayload, CatermError> {
+    let session = crate::session::get_current_session()
+        .unwrap_or_else(|_| crate::session::Session::new("default", "member"));
     let cfg = get_stored_config()?;
     build_context(
         &session,

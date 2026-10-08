@@ -89,7 +89,9 @@ pub fn compute_effective_state(
                 is_pro: false,
                 expires_at: payload.expires_at.clone(),
                 grace_until: payload.grace_until.clone(),
-                warning: Some("Offline allowance exceeded (7 days). Please reconnect online.".into()),
+                warning: Some(
+                    "Offline allowance exceeded (7 days). Please reconnect online.".into(),
+                ),
             };
         }
     }

@@ -22,7 +22,7 @@ impl Default for HttpClientConfig {
     fn default() -> Self {
         Self {
             slug: "camark".to_string(),
-            version: "0.1.0-dev".to_string(),
+            version: env!("CARGO_PKG_VERSION").to_string(),
             brand_website: "https://www.cecepazhar.com".to_string(),
             app_identifier: "com.fathforce.camark".to_string(),
         }
@@ -107,7 +107,10 @@ mod tests {
         let client = HttpClient::default_client();
         assert_eq!(
             client.user_agent(),
-            "camark/0.1.0-dev (+https://www.cecepazhar.com)"
+            format!(
+                "camark/{} (+https://www.cecepazhar.com)",
+                env!("CARGO_PKG_VERSION")
+            )
         );
     }
 

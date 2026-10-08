@@ -58,6 +58,14 @@ const COMMANDS: &[&str] = &[
     "vault_delete_document",
     // CAMark Standalone HTML Exporter
     "export_document_html",
+    "export_document_pdf",
+    "ai_copilot_action",
+    "pro_status",
+    "pro_server_available",
+    "pro_login",
+    "pro_register",
+    "pro_activate_license",
+    "pro_logout",
 ];
 
 fn main() {

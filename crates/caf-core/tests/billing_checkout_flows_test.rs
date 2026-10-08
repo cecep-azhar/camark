@@ -1,8 +1,8 @@
+use base64::Engine;
 use caf_core::billing::client::{BillingConfig, GccBillingClient};
 use caf_core::billing::state::EffectiveTier;
 use caf_core::billing::store;
-use caf_xtask::gcc_mock::{create_mock_app, init_dev_keys, MockLicense, MockState};
-use base64::Engine;
+use caf_xtask::gcc_mock::{MockLicense, MockState, create_mock_app, init_dev_keys};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -44,10 +44,17 @@ async fn test_checkout_modes_poll_and_license_key() {
 
     // Register initial device as Free
     let _auth = client
-        .verify_otp("buyer@fathforce.com", "123456", "dev-buyer-1", "Linux Desktop")
+        .verify_otp(
+            "buyer@fathforce.com",
+            "123456",
+            "dev-buyer-1",
+            "Linux Desktop",
+        )
         .expect("OTP verify failed");
 
-    let (_, initial_state) = client.refresh_entitlement().expect("initial refresh failed");
+    let (_, initial_state) = client
+        .refresh_entitlement()
+        .expect("initial refresh failed");
     assert_eq!(initial_state.tier, EffectiveTier::Free);
     assert!(!initial_state.is_pro);
 
@@ -55,14 +62,21 @@ async fn test_checkout_modes_poll_and_license_key() {
     // Scenario 1: IDR Plan -> Completion Mode: "poll" (Mayar)
     // =========================================================================
     let idr_plans = client.get_plans(Some("IDR")).expect("get IDR plans failed");
-    let monthly_plan = idr_plans.iter().find(|p| p.billing_type == "monthly").unwrap();
-    
-    let checkout = client.create_checkout(&monthly_plan.plan_id).expect("create checkout failed");
+    let monthly_plan = idr_plans
+        .iter()
+        .find(|p| p.billing_type == "monthly")
+        .unwrap();
+
+    let checkout = client
+        .create_checkout(&monthly_plan.plan_id)
+        .expect("create checkout failed");
     assert_eq!(checkout.completion_mode, "poll");
     assert!(checkout.checkout_url.contains("pub.mayar.id"));
 
     // Poll status is pending
-    let status_pending = client.poll_checkout_status(&checkout.checkout_id).expect("poll failed");
+    let status_pending = client
+        .poll_checkout_status(&checkout.checkout_id)
+        .expect("poll failed");
     assert_eq!(status_pending, "pending");
 
     // Simulate Mayar Webhook payment on Mock server
@@ -72,7 +86,10 @@ async fn test_checkout_modes_poll_and_license_key() {
         chk.status = "paid".to_string();
 
         let mut accounts = state.accounts.lock().unwrap();
-        let acc = accounts.values_mut().find(|a| a.id == chk.account_id).unwrap();
+        let acc = accounts
+            .values_mut()
+            .find(|a| a.id == chk.account_id)
+            .unwrap();
         acc.tier = "pro".to_string();
         acc.billing_type = "monthly".to_string();
         acc.status = "active".to_string();
@@ -80,7 +97,9 @@ async fn test_checkout_modes_poll_and_license_key() {
     }
 
     // Poll status turns to paid
-    let status_paid = client.poll_checkout_status(&checkout.checkout_id).expect("poll failed");
+    let status_paid = client
+        .poll_checkout_status(&checkout.checkout_id)
+        .expect("poll failed");
     assert_eq!(status_paid, "paid");
 
     // Client refreshes entitlement -> Instantly becomes Pro without restart
@@ -96,7 +115,10 @@ async fn test_checkout_modes_poll_and_license_key() {
     store::clear_billing_state().unwrap();
 
     let usd_plans = client.get_plans(Some("USD")).expect("get USD plans failed");
-    let lifetime_usd = usd_plans.iter().find(|p| p.billing_type == "lifetime").unwrap();
+    let lifetime_usd = usd_plans
+        .iter()
+        .find(|p| p.billing_type == "lifetime")
+        .unwrap();
 
     // In Ko-fi flow, buyer purchases on Ko-fi and receives a license key via email
     let issued_key = "KOFI-LIFETIME-XYZ999";

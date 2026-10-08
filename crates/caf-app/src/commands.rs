@@ -1,9 +1,9 @@
 //! Thin Tauri command bindings for CAMark.
 
-use caf_core::{CafError, ai, backup, crash, feedback, notes, prefs, profiles, vault};
-use crate::fs_workspace::{self, FileNode};
-use crate::vault_docs::{self, VaultDocument, VaultDocInput};
 use crate::exporter::{self, ExportResult};
+use crate::fs_workspace::{self, FileNode};
+use crate::vault_docs::{self, VaultDocInput, VaultDocument};
+use caf_core::{CafError, ai, backup, crash, feedback, notes, prefs, profiles, vault};
 
 async fn run_blocking<F, R>(f: F) -> Result<R, CafError>
 where
@@ -286,3 +286,72 @@ pub async fn export_document_html(
 ) -> Result<ExportResult, String> {
     exporter::export_html(html_content, doc_title, target_path).await
 }
+
+#[tauri::command]
+pub async fn export_document_pdf(
+    html_content: String,
+    doc_title: String,
+    target_path: String,
+) -> Result<ExportResult, String> {
+    exporter::export_pdf(html_content, doc_title, target_path).await
+}
+
+#[tauri::command]
+pub async fn ai_copilot_action(
+    action: String,
+    selected_text: String,
+) -> Result<String, CafError> {
+    run_blocking(move || run_copilot_sync(&action, &selected_text)).await
+}
+
+fn run_copilot_sync(action: &str, text: &str) -> Result<String, CafError> {
+    let sys = match action {
+        "toc" => "Generate a Markdown Table of Contents from these headings.",
+        "summary" => "Generate a clear, high-impact executive summary.",
+        "humanize" => "Improve and humanize this Markdown text naturally.",
+        "table" => "Convert this text into a properly aligned GFM table.",
+        _ => "Format and polish this Markdown text.",
+    };
+    let prompt = format!("{}\n\n```markdown\n{}\n```", sys, text);
+    let s = caf_core::session::get_current_session()
+        .unwrap_or_else(|_| caf_core::session::Session::new("default", "member"));
+    let resp = ai::chat(&s, &prompt, None, true)?;
+    Ok(resp.message)
+}
+
+// Pro & GCC Auth Commands
+#[tauri::command]
+pub async fn pro_status() -> Result<caf_core::pro::ProStatus, CafError> {
+    run_blocking(caf_core::pro::get_pro_status).await
+}
+
+#[tauri::command]
+pub async fn pro_server_available() -> Result<bool, CafError> {
+    run_blocking(|| Ok(caf_core::pro::server_available())).await
+}
+
+#[tauri::command]
+pub async fn pro_login(email: String, password: String) -> Result<caf_core::pro::ProAccount, CafError> {
+    run_blocking(move || caf_core::pro::login(&email, &password)).await
+}
+
+#[tauri::command]
+pub async fn pro_register(
+    email: String,
+    password: String,
+    name: String,
+    locale: String,
+) -> Result<(), CafError> {
+    run_blocking(move || caf_core::pro::register(&email, &password, &name, &locale)).await
+}
+
+#[tauri::command]
+pub async fn pro_activate_license(license_key: String) -> Result<caf_core::pro::ProStatus, CafError> {
+    run_blocking(move || caf_core::pro::activate_license(&license_key)).await
+}
+
+#[tauri::command]
+pub async fn pro_logout() -> Result<(), CafError> {
+    run_blocking(caf_core::pro::logout).await
+}
+

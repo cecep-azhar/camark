@@ -136,6 +136,9 @@ export const proStartTrial = () => invoke<SyncOutcome>('pro_start_trial');
 export const proAccount = () => invoke<AccountDetails>('pro_account');
 export const proRevokeDevice = (deviceId: string) => invoke<void>('pro_revoke_device', { deviceId });
 export const proLogout = () => invoke<void>('pro_logout');
+export const proActivateLicense = (licenseKey: string) =>
+  invoke<ProStatus>('pro_activate_license', { licenseKey });
+
 
 /**
  * The server's stable error code for a failed Pro call (`INVALID_CREDENTIALS`, `NETWORK`, ...),

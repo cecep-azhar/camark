@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { t } from '$lib/i18n/index.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import Logo from '$lib/components/Logo.svelte';
   import ProfileAvatar from '$lib/components/ProfileAvatar.svelte';
   import AvatarPicker from '$lib/components/AvatarPicker.svelte';
   import AmbientSettingsCard from '$lib/components/AmbientSettingsCard.svelte';
@@ -14,7 +15,19 @@
   import { getAiSettings, saveAiSettings, type AiSettings } from '$lib/api/ai';
   import { listProfiles, saveProfile as saveFamilyProfile, type ProfileRecord } from '$lib/api/profiles';
   import { exportEncryptedBackup, importEncryptedBackup } from '$lib/api/prefs';
-  import { APP_VERSION } from '$lib/appInfo';
+  import { proActivateLicense, proLogout, type ProAccount } from '$lib/api/pro';
+  import ProLoginForm from '$lib/components/ProLoginForm.svelte';
+  import {
+    APP_VERSION,
+    REPO_URL,
+    WEBSITE_URL,
+    AUTHOR_NAME,
+    AUTHOR_URL,
+    CONTACT_EMAIL,
+    CONTACT_PHONE,
+    INCUBATOR_NAME,
+    INCUBATOR_URL
+  } from '$lib/appInfo';
   import { relaunch } from '@tauri-apps/plugin-process';
 
   // Surface tokens aligning 100% with CATerm architecture and design system
@@ -26,7 +39,7 @@
   const INPUT = 'w-full px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-cyan-500 transition-colors';
   const EYE_BUTTON = 'absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors p-1.5 cursor-pointer';
 
-  const TABS = ['profile', 'security', 'appearance', 'profiles', 'ai', 'backup', 'about'] as const;
+  const TABS = ['profile', 'pro', 'security', 'appearance', 'profiles', 'ai', 'backup', 'about'] as const;
   type SettingsTab = (typeof TABS)[number];
 
   const requestedTab = page.url.searchParams.get('tab') ?? '';
@@ -39,6 +52,40 @@
     const url = new URL(window.location.href);
     url.searchParams.set('tab', tab);
     void goto(url.toString(), { replaceState: true, noScroll: true, keepFocus: true });
+  }
+
+  // License & Pro State
+  let licenseKeyInput = $state('');
+  let isActivatingLicense = $state(false);
+
+  async function handleActivateLicense() {
+    if (!licenseKeyInput.trim()) return;
+    isActivatingLicense = true;
+    try {
+      const status = await proActivateLicense(licenseKeyInput.trim());
+      showToast('Lisensi Pro berhasil diaktivasi!', 'success');
+      licenseKeyInput = '';
+      window.location.reload();
+    } catch (e: any) {
+      alert(`Gagal aktivasi lisensi: ${e?.message || e}`);
+    } finally {
+      isActivatingLicense = false;
+    }
+  }
+
+  async function handleProSignedIn(account: ProAccount) {
+    showToast(`Berhasil masuk sebagai ${account.name}!`, 'success');
+    window.location.reload();
+  }
+
+  async function handleProLogout() {
+    try {
+      await proLogout();
+      showToast('Berhasil keluar akun Pro', 'info');
+      window.location.reload();
+    } catch (e: any) {
+      alert(`Gagal keluar: ${e}`);
+    }
   }
 
   // Profile State
@@ -279,7 +326,7 @@
           ? 'border-cyan-500 text-neutral-900 dark:text-white font-semibold'
           : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'}"
       >
-        {t(`settings.tabs.${tab}`)}
+        {tab === 'pro' ? 'Pro & Lisensi' : t(`settings.tabs.${tab}`)}
       </button>
     {/each}
   </div>
@@ -347,6 +394,82 @@
         >
           {t('settings.profile.changeMasterPassword')}
         </button>
+      </div>
+    </div>
+  {:else if activeTab === 'pro'}
+    <div class="{CARD} space-y-6">
+      <div class="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">CAMark Pro & Lisensi GCC Cloud</h2>
+            {#if pro.isPro || profile.plan === 'pro'}
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 uppercase">
+                Aktif ✓
+              </span>
+            {:else}
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 uppercase">
+                Free Edition
+              </span>
+            {/if}
+          </div>
+          <p class="{MUTED} text-sm mt-1">
+            Fitur Pro mencakup Native PDF Print, AI Contextual Copilot, Table Tools, dan Sync Brankas SQLCipher.
+          </p>
+        </div>
+      </div>
+
+      <!-- License Key Activation Box -->
+      <div class="{SUBCARD} space-y-3">
+        <h3 class="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+          <span>🔑</span>
+          <span>Aktivasi License Key</span>
+        </h3>
+        <p class="text-xs {MUTED}">
+          Masukkan kode lisensi resmi dari Ko-fi, Mayar, atau Admin untuk membuka seluruh fitur Pro.
+        </p>
+
+        <div class="flex items-center gap-2 pt-1 max-w-lg">
+          <input
+            type="text"
+            bind:value={licenseKeyInput}
+            placeholder="CMRK-PRO-XXXX-XXXX-XXXX"
+            class="{INPUT} font-mono uppercase"
+          />
+          <button
+            type="button"
+            disabled={isActivatingLicense || !licenseKeyInput.trim()}
+            onclick={handleActivateLicense}
+            class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors shrink-0 cursor-pointer"
+          >
+            {isActivatingLicense ? 'Aktivasi...' : 'Aktivasi'}
+          </button>
+        </div>
+      </div>
+
+      <!-- GCC Cloud Account Section -->
+      <div class="{SUBCARD} space-y-4">
+        <h3 class="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+          <span>☁️</span>
+          <span>Akun GCC Cloud Hub</span>
+        </h3>
+
+        {#if pro.status?.signedIn && pro.status?.account}
+          <div class="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
+            <div>
+              <p class="text-xs font-bold text-neutral-900 dark:text-white">{pro.status.account.name}</p>
+              <p class="text-xs {MUTED}">{pro.status.account.email}</p>
+            </div>
+            <button
+              type="button"
+              onclick={handleProLogout}
+              class="px-3 py-1.5 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs font-medium cursor-pointer"
+            >
+              Keluar Akun
+            </button>
+          </div>
+        {:else}
+          <ProLoginForm onSignedIn={handleProSignedIn} />
+        {/if}
       </div>
     </div>
   {:else if activeTab === 'security'}
@@ -783,27 +906,56 @@
     </div>
   {:else if activeTab === 'about'}
     <div class="{CARD} space-y-6">
-      <div>
-        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">{t('settings.about.title')}</h2>
-        <p class="{MUTED} text-sm mt-0.5">{t('settings.about.subtitle')}</p>
+      <div class="flex items-center gap-3.5">
+        <div class="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+          <Logo size={36} mode="brand" />
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">CAMark Studio</h2>
+          <p class="{MUTED} text-xs mt-0.5">{t('settings.about.subtitle')}</p>
+        </div>
       </div>
 
       <div class="{SUBCARD} divide-y divide-neutral-200 dark:divide-neutral-800 text-xs">
-        <div class="flex justify-between py-2.5">
+        <div class="flex justify-between items-center py-2.5">
           <span class={MUTED}>{t('settings.about.version')}</span>
           <span class="font-mono font-semibold text-cyan-600 dark:text-cyan-400">v{APP_VERSION}</span>
         </div>
-        <div class="flex justify-between py-2.5">
+        <div class="flex justify-between items-center py-2.5">
           <span class={MUTED}>{t('settings.about.stack')}</span>
           <span class="text-neutral-800 dark:text-neutral-200">{t('settings.about.stackVal')}</span>
         </div>
-        <div class="flex justify-between py-2.5">
+        <div class="flex justify-between items-center py-2.5">
           <span class={MUTED}>{t('settings.about.license')}</span>
           <span class="text-neutral-800 dark:text-neutral-200">{t('settings.about.licenseVal')}</span>
         </div>
-        <div class="flex justify-between py-2.5">
+        <div class="flex justify-between items-center py-2.5">
           <span class={MUTED}>{t('settings.about.author')}</span>
-          <span class="font-medium text-neutral-900 dark:text-white">{t('settings.about.authorVal')}</span>
+          <a href={AUTHOR_URL} target="_blank" rel="noreferrer" class="font-medium text-cyan-600 dark:text-cyan-400 hover:underline">
+            {AUTHOR_NAME}
+          </a>
+        </div>
+        <div class="flex justify-between items-center py-2.5">
+          <span class={MUTED}>Website</span>
+          <a href={WEBSITE_URL} target="_blank" rel="noreferrer" class="font-mono text-cyan-600 dark:text-cyan-400 hover:underline">
+            {WEBSITE_URL}
+          </a>
+        </div>
+        <div class="flex justify-between items-center py-2.5">
+          <span class={MUTED}>Contact & Support</span>
+          <div class="flex items-center gap-3">
+            <a href="mailto:{CONTACT_EMAIL}" class="text-neutral-800 dark:text-neutral-200 hover:text-cyan-500 font-mono">
+              {CONTACT_EMAIL}
+            </a>
+            <span class="text-neutral-300 dark:text-neutral-700">•</span>
+            <span class="text-neutral-800 dark:text-neutral-200 font-mono">{CONTACT_PHONE}</span>
+          </div>
+        </div>
+        <div class="flex justify-between items-center py-2.5">
+          <span class={MUTED}>Studio / Incubator</span>
+          <a href={INCUBATOR_URL} target="_blank" rel="noreferrer" class="text-neutral-800 dark:text-neutral-200 hover:text-cyan-500 font-medium">
+            {INCUBATOR_NAME} ({INCUBATOR_URL})
+          </a>
         </div>
       </div>
     </div>

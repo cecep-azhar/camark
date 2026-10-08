@@ -1,7 +1,7 @@
 //! Feature-level Pro access guards.
 
 use super::client::GccBillingClient;
-use super::state::{compute_effective_state, EffectiveState, EffectiveTier};
+use super::state::{EffectiveState, EffectiveTier, compute_effective_state};
 use super::store;
 use super::token::verify_and_parse_token;
 use crate::error::{CatermError, ProError};
@@ -31,7 +31,9 @@ pub fn require_pro(
         now_unix,
     );
 
-    if effective.is_pro && (effective.tier == EffectiveTier::Pro || effective.tier == EffectiveTier::ProGrace) {
+    if effective.is_pro
+        && (effective.tier == EffectiveTier::Pro || effective.tier == EffectiveTier::ProGrace)
+    {
         Ok(effective)
     } else {
         Err(CatermError::Pro(ProError::FeatureLocked))

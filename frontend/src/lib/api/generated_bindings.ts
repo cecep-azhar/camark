@@ -113,3 +113,51 @@ export async function invoke_setPerformancePrefs(prefs: any): Promise<any> {
   return invoke('set_performance_prefs', { prefs: prefs });
 }
 
+export async function invoke_workspaceListDirectory(dirPath: string): Promise<any[]> {
+  return invoke('workspace_list_directory', { dir_path: dirPath });
+}
+
+export async function invoke_workspaceReadFile(filePath: string): Promise<string> {
+  return invoke('workspace_read_file', { file_path: filePath });
+}
+
+export async function invoke_workspaceWriteFile(filePath: string, content: string): Promise<any> {
+  return invoke('workspace_write_file', { file_path: filePath, content: content });
+}
+
+export async function invoke_workspaceCreateFile(filePath: string): Promise<any> {
+  return invoke('workspace_create_file', { file_path: filePath });
+}
+
+export async function invoke_workspaceCreateDirectory(dirPath: string): Promise<any> {
+  return invoke('workspace_create_directory', { dir_path: dirPath });
+}
+
+export async function invoke_workspaceRenameFile(oldPath: string, newPath: string): Promise<any> {
+  return invoke('workspace_rename_file', { old_path: oldPath, new_path: newPath });
+}
+
+export async function invoke_workspaceDeleteFile(filePath: string): Promise<any> {
+  return invoke('workspace_delete_file', { file_path: filePath });
+}
+
+export async function invoke_getInitialFilePath(): Promise<string | null> {
+  return invoke('get_initial_file_path');
+}
+
+export async function invoke_vaultListDocuments(callerProfileId: string): Promise<any[]> {
+  return invoke('vault_list_documents', { caller_profile_id: callerProfileId });
+}
+
+export async function invoke_vaultSaveDocument(input: any, callerProfileId: string): Promise<any> {
+  return invoke('vault_save_document', { input: input, caller_profile_id: callerProfileId });
+}
+
+export async function invoke_vaultDeleteDocument(id: string): Promise<any> {
+  return invoke('vault_delete_document', { id: id });
+}
+
+export async function invoke_exportDocumentHtml(htmlContent: string, docTitle: string, targetPath: string): Promise<any> {
+  return invoke('export_document_html', { html_content: htmlContent, doc_title: docTitle, target_path: targetPath });
+}
+

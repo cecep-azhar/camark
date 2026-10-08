@@ -232,6 +232,14 @@ pub fn run_with_start(start: std::time::Instant) {
             commands::vault_save_document,
             commands::vault_delete_document,
             commands::export_document_html,
+            commands::export_document_pdf,
+            commands::ai_copilot_action,
+            commands::pro_status,
+            commands::pro_server_available,
+            commands::pro_login,
+            commands::pro_register,
+            commands::pro_activate_license,
+            commands::pro_logout,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

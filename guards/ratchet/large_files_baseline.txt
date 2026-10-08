@@ -1,2 +1,3 @@
 15822632	build/bin/caterm
 56919	caframework-evidence-report.tar.gz
+67000	crates/caf-app/gen/android/gradle/wrapper/gradle-wrapper.jar

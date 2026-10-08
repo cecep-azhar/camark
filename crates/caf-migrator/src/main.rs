@@ -5,11 +5,7 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 #[derive(Parser, Debug)]
-#[command(
-    name = "caf-migrator",
-    version,
-    about = "Run DB migrations for camark"
-)]
+#[command(name = "caf-migrator", version, about = "Run DB migrations for camark")]
 struct Args {
     /// Path to the SQLite database file
     #[arg(short, long, default_value = "camark.db")]

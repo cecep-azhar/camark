@@ -1,0 +1,302 @@
+<script lang="ts">
+  import type { EditorView } from 'codemirror';
+  import { undo, redo } from '@codemirror/commands';
+  import {
+    wrapSelection,
+    insertHeading,
+    insertList,
+    insertTableTemplate,
+    formatMarkdownTable,
+  } from '$lib/utils/markdownTools';
+
+  interface Props {
+    editorView?: EditorView | null;
+    isZenMode: boolean;
+    onToggleZen: () => void;
+    onFormatDocumentTable: () => void;
+  }
+
+  let { editorView, isZenMode, onToggleZen, onFormatDocumentTable }: Props = $props();
+
+  function applyBold() {
+    if (editorView) wrapSelection(editorView, '**', '**', 'teks tebal');
+  }
+
+  function applyItalic() {
+    if (editorView) wrapSelection(editorView, '*', '*', 'teks miring');
+  }
+
+  function applyStrike() {
+    if (editorView) wrapSelection(editorView, '~~', '~~', 'coret');
+  }
+
+  function applyH1() {
+    if (editorView) insertHeading(editorView, 1);
+  }
+
+  function applyH2() {
+    if (editorView) insertHeading(editorView, 2);
+  }
+
+  function applyH3() {
+    if (editorView) insertHeading(editorView, 3);
+  }
+
+  function applyBulletList() {
+    if (editorView) insertList(editorView, 'bullet');
+  }
+
+  function applyNumberList() {
+    if (editorView) insertList(editorView, 'number');
+  }
+
+  function applyTaskList() {
+    if (editorView) insertList(editorView, 'task');
+  }
+
+  function applyQuote() {
+    if (editorView) wrapSelection(editorView, '> ', '', 'kutipan');
+  }
+
+  function applyCode() {
+    if (editorView) wrapSelection(editorView, '`', '`', 'kode');
+  }
+
+  function applyCodeBlock() {
+    if (editorView) wrapSelection(editorView, '```\n', '\n```', 'kode blok');
+  }
+
+  function applyLink() {
+    if (editorView) wrapSelection(editorView, '[', '](https://)', 'tautan');
+  }
+
+  function applyTable() {
+    if (editorView) insertTableTemplate(editorView, 3, 3);
+  }
+
+  function handleUndo() {
+    if (editorView) undo(editorView);
+  }
+
+  function handleRedo() {
+    if (editorView) redo(editorView);
+  }
+</script>
+
+<div
+  class="h-9 px-2 bg-[#121217] border-b border-[#262626] flex items-center justify-between text-neutral-400 select-none overflow-x-auto scrollbar-none z-10 shrink-0"
+>
+  <!-- Left Formatting Tools -->
+  <div class="flex items-center gap-0.5">
+    <!-- Undo / Redo -->
+    <button
+      type="button"
+      onclick={handleUndo}
+      title="Urungkan (Ctrl+Z)"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 7v6h6"></path>
+        <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      onclick={handleRedo}
+      title="Ulangi (Ctrl+Y)"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 7v6h-6"></path>
+        <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"></path>
+      </svg>
+    </button>
+
+    <span class="w-[1px] h-3.5 bg-[#262626] mx-1"></span>
+
+    <!-- Headings -->
+    <button
+      type="button"
+      onclick={applyH1}
+      title="Heading 1"
+      class="px-1.5 py-0.5 rounded text-xs font-bold hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      H1
+    </button>
+    <button
+      type="button"
+      onclick={applyH2}
+      title="Heading 2"
+      class="px-1.5 py-0.5 rounded text-xs font-bold hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      H2
+    </button>
+    <button
+      type="button"
+      onclick={applyH3}
+      title="Heading 3"
+      class="px-1.5 py-0.5 rounded text-xs font-bold hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      H3
+    </button>
+
+    <span class="w-[1px] h-3.5 bg-[#262626] mx-1"></span>
+
+    <!-- Text Formatting -->
+    <button
+      type="button"
+      onclick={applyBold}
+      title="Tebal (Ctrl+B)"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white font-serif font-black text-xs transition-colors"
+    >
+      B
+    </button>
+    <button
+      type="button"
+      onclick={applyItalic}
+      title="Miring (Ctrl+I)"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white italic font-serif text-xs transition-colors"
+    >
+      I
+    </button>
+    <button
+      type="button"
+      onclick={applyStrike}
+      title="Coret"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white line-through text-xs transition-colors"
+    >
+      S
+    </button>
+
+    <span class="w-[1px] h-3.5 bg-[#262626] mx-1"></span>
+
+    <!-- Lists -->
+    <button
+      type="button"
+      onclick={applyBulletList}
+      title="Bullet List"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+      </svg>
+    </button>
+    <button
+      type="button"
+      onclick={applyNumberList}
+      title="Numbered List"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="10" y1="6" x2="21" y2="6"></line>
+        <line x1="10" y1="12" x2="21" y2="12"></line>
+        <line x1="10" y1="18" x2="21" y2="18"></line>
+        <path d="M4 6h1v4"></path>
+        <path d="M4 10h2"></path>
+        <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      onclick={applyTaskList}
+      title="Task Checkbox List"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="5" width="6" height="6" rx="1"></rect>
+        <line x1="13" y1="8" x2="21" y2="8"></line>
+        <line x1="13" y1="16" x2="21" y2="16"></line>
+        <path d="M3 17l2 2 4-4"></path>
+      </svg>
+    </button>
+
+    <span class="w-[1px] h-3.5 bg-[#262626] mx-1"></span>
+
+    <!-- Blockquote & Code -->
+    <button
+      type="button"
+      onclick={applyQuote}
+      title="Kutipan (Blockquote)"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+        <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      onclick={applyCode}
+      title="Inline Code"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white font-mono text-[11px] transition-colors"
+    >
+      &lt;/&gt;
+    </button>
+    <button
+      type="button"
+      onclick={applyCodeBlock}
+      title="Code Block"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white font-mono text-[11px] transition-colors"
+    >
+      {'{ }'}
+    </button>
+    <button
+      type="button"
+      onclick={applyLink}
+      title="Sisipkan Tautan"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white transition-colors"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    </button>
+
+    <span class="w-[1px] h-3.5 bg-[#262626] mx-1"></span>
+
+    <!-- Table Tools -->
+    <button
+      type="button"
+      onclick={applyTable}
+      title="Sisipkan Tabel 3x3"
+      class="p-1 rounded hover:bg-[#1f1f28] hover:text-white flex items-center gap-1 transition-colors"
+    >
+      <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+        <path d="M3 9h18"></path>
+        <path d="M3 15h18"></path>
+        <path d="M9 3v18"></path>
+        <path d="M15 3v18"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      onclick={onFormatDocumentTable}
+      title="Format & Auto-Align Kolom Tabel (|)"
+      class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#18181F] hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center gap-1 transition-colors"
+    >
+      <span>Align Tabel</span>
+    </button>
+  </div>
+
+  <!-- Right: Zen Mode Switch -->
+  <div class="flex items-center gap-1">
+    <button
+      type="button"
+      onclick={onToggleZen}
+      class="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors {isZenMode ? 'bg-cyan-500 text-black font-bold' : 'hover:bg-[#1f1f28] text-neutral-400 hover:text-white'}"
+      title="Zen Mode / Typewriter Scrolling (fokus tanpa distraksi)"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M3 12h1m16 0h1m-9-9v1m0 16v1"></path>
+      </svg>
+      <span>{isZenMode ? 'Zen Mode Aktif' : 'Zen Mode'}</span>
+    </button>
+  </div>
+</div>

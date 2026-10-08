@@ -15,7 +15,14 @@
   import { page } from '$app/state';
 
   import FileTreeNode from '$lib/components/FileTreeNode.svelte';
+  import MarkdownFormatToolbar from '$lib/components/MarkdownFormatToolbar.svelte';
+  import ContextualAiActionBar from '$lib/components/ContextualAiActionBar.svelte';
   import type { FileNode } from '$lib/types/fileTree';
+  import {
+    formatMarkdownTable,
+    htmlTableToMarkdown,
+    tsvToMarkdown,
+  } from '$lib/utils/markdownTools';
 
   // State
   const layoutState = getLayoutState();
@@ -40,6 +47,18 @@
   let viewMode = $state<'split' | 'editor' | 'preview'>('split');
   let isSaving = $state<boolean>(false);
 
+  // Zen & Focus Mode
+  let isZenMode = $state<boolean>(false);
+
+  // Text selection & AI Copilot Action Bar
+  let selectedText = $state<string>('');
+  let selectionRange = $state<{ from: number; to: number } | null>(null);
+
+  // Synchronized scroll state (60fps requestAnimationFrame)
+  let isSyncingEditor = false;
+  let isSyncingPreview = false;
+  let syncRafId: number | null = null;
+
   // Stats calculation
   let wordCount = $derived(rawMarkdown.trim() ? rawMarkdown.trim().split(/\s+/).length : 0);
   let charCount = $derived(rawMarkdown.length);
@@ -48,11 +67,11 @@
 
   let editorElement = $state<HTMLDivElement | null>(null);
   let previewElement = $state<HTMLElement | null>(null);
-  let editorView: EditorView;
+  let editorView = $state<EditorView | null>(null);
 
   // Custom marked renderer for Pro Markdown (Zebra tables, code block headers with copy buttons)
   const proRenderer = new marked.Renderer();
-  
+
   // Custom Table with modern wrapper
   const originalTable = proRenderer.table;
   proRenderer.table = function (token: any) {
@@ -101,11 +120,144 @@
     expandedDirs = next;
   }
 
+  // Synchronized Scrolling Logic
+  function syncScrollEditorToPreview() {
+    if (isSyncingPreview || !editorView || !previewElement || viewMode !== 'split') return;
+    if (syncRafId) cancelAnimationFrame(syncRafId);
+    syncRafId = requestAnimationFrame(() => {
+      isSyncingEditor = true;
+      const scrollDom = editorView!.scrollDOM;
+      const editorMax = scrollDom.scrollHeight - scrollDom.clientHeight;
+      if (editorMax > 0 && previewElement) {
+        const ratio = scrollDom.scrollTop / editorMax;
+        const previewMax = previewElement.scrollHeight - previewElement.clientHeight;
+        previewElement.scrollTop = ratio * previewMax;
+      }
+      setTimeout(() => {
+        isSyncingEditor = false;
+      }, 40);
+    });
+  }
+
+  function syncScrollPreviewToEditor() {
+    if (isSyncingEditor || !editorView || !previewElement || viewMode !== 'split') return;
+    if (syncRafId) cancelAnimationFrame(syncRafId);
+    syncRafId = requestAnimationFrame(() => {
+      isSyncingPreview = true;
+      const previewMax = previewElement!.scrollHeight - previewElement!.clientHeight;
+      if (previewMax > 0 && editorView) {
+        const ratio = previewElement!.scrollTop / previewMax;
+        const scrollDom = editorView!.scrollDOM;
+        const editorMax = scrollDom.scrollHeight - scrollDom.clientHeight;
+        scrollDom.scrollTop = ratio * editorMax;
+      }
+      setTimeout(() => {
+        isSyncingPreview = false;
+      }, 40);
+    });
+  }
+
+  // Smart Paste Handler (converts HTML tables and Excel TSV to Markdown table)
+  function handleEditorPaste(e: ClipboardEvent): boolean {
+    const html = e.clipboardData?.getData('text/html');
+    const text = e.clipboardData?.getData('text/plain');
+
+    if (html && html.includes('<table')) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const table = doc.querySelector('table');
+      if (table) {
+        e.preventDefault();
+        const mdTable = htmlTableToMarkdown(table);
+        insertTextIntoEditor(mdTable);
+        showToast('Tabel HTML otomatis dikonversi ke format Markdown!', 'success');
+        return true;
+      }
+    } else if (text && text.includes('\t') && text.includes('\n')) {
+      // Spreadsheet TSV
+      e.preventDefault();
+      const mdTable = tsvToMarkdown(text);
+      insertTextIntoEditor(mdTable);
+      showToast('Data spreadsheet otomatis dikonversi ke tabel Markdown!', 'success');
+      return true;
+    }
+    return false;
+  }
+
+  function insertTextIntoEditor(textToInsert: string) {
+    if (!editorView) return;
+    const sel = editorView.state.selection.main;
+    editorView.dispatch({
+      changes: { from: sel.from, to: sel.to, insert: textToInsert },
+      selection: { anchor: sel.from + textToInsert.length },
+    });
+    editorView.focus();
+  }
+
+  // Table Auto-Formatter
+  function handleFormatDocumentTable() {
+    if (!editorView) return;
+    const sel = editorView.state.selection.main;
+    if (sel.from !== sel.to) {
+      const selected = editorView.state.sliceDoc(sel.from, sel.to);
+      const formatted = formatMarkdownTable(selected);
+      editorView.dispatch({
+        changes: { from: sel.from, to: sel.to, insert: formatted },
+      });
+      showToast('Tabel terpilih berhasil dirapikan!', 'success');
+    } else {
+      const docText = editorView.state.doc.toString();
+      const tableBlockRegex = /((?:^[ \t]*\|.+$\n?){2,})/gm;
+      let count = 0;
+      const formattedDoc = docText.replace(tableBlockRegex, (match) => {
+        count++;
+        return formatMarkdownTable(match);
+      });
+      if (count > 0) {
+        editorView.dispatch({
+          changes: { from: 0, to: docText.length, insert: formattedDoc },
+        });
+        showToast(`${count} tabel berhasil di-align rapi!`, 'success');
+      } else {
+        showToast('Tidak ada tabel yang ditemukan dalam dokumen.', 'info');
+      }
+    }
+  }
+
+  function handleToggleZen() {
+    isZenMode = !isZenMode;
+    if (isZenMode) {
+      viewMode = 'editor';
+      showFileTree = false;
+      layoutState.hideSidebar = true;
+      showToast('Zen Mode aktif: Mengetik terpusat tanpa distraksi', 'info');
+    } else {
+      layoutState.hideSidebar = false;
+      showFileTree = true;
+      viewMode = 'split';
+    }
+  }
+
+  function handleApplyAiResult(resultText: string) {
+    if (!editorView || !selectionRange) return;
+    editorView.dispatch({
+      changes: { from: selectionRange.from, to: selectionRange.to, insert: resultText },
+      selection: { anchor: selectionRange.from + resultText.length },
+    });
+    selectedText = '';
+    selectionRange = null;
+    editorView.focus();
+  }
+
   onMount(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
         e.preventDefault();
         toggleFileTree();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        exportPdf();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -113,30 +265,56 @@
     mermaid.initialize({
       startOnLoad: false,
       theme: 'dark',
-      securityLevel: 'loose'
+      securityLevel: 'loose',
     });
 
     renderMarkdown(rawMarkdown);
 
-    // Initialize CodeMirror 6 with oneDark theme
+    // Initialize CodeMirror 6 with oneDark theme and update listeners
     if (editorElement) {
-      editorView = new EditorView({
+      const view = new EditorView({
         doc: rawMarkdown,
         extensions: [
           basicSetup,
           markdown(),
           oneDark,
           EditorView.lineWrapping,
+          EditorView.domEventHandlers({
+            paste(event) {
+              return handleEditorPaste(event);
+            },
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               rawMarkdown = update.state.doc.toString();
               renderMarkdown(rawMarkdown);
               autoSave();
             }
-          })
+            if (update.selectionSet) {
+              const sel = update.state.selection.main;
+              if (sel.from !== sel.to) {
+                selectedText = update.state.sliceDoc(sel.from, sel.to);
+                selectionRange = { from: sel.from, to: sel.to };
+              } else {
+                selectedText = '';
+                selectionRange = null;
+              }
+
+              // Typewriter scrolling in Zen Mode (center current line)
+              if (isZenMode) {
+                const head = sel.head;
+                const line = update.view.lineBlockAt(head);
+                const halfHeight = update.view.scrollDOM.clientHeight / 2;
+                update.view.scrollDOM.scrollTop = Math.max(0, line.top - halfHeight);
+              }
+            }
+          }),
         ],
-        parent: editorElement
+        parent: editorElement,
       });
+
+      editorView = view;
+      view.scrollDOM.addEventListener('scroll', syncScrollEditorToPreview, { passive: true });
     }
 
     // Check initial file passed via CLI or Open With
@@ -165,12 +343,11 @@
       }
     }).catch((e) => console.warn('Failed to listen to open-file event:', e));
 
-    // Default load directory workspace or vault mode
     if (page.url.searchParams.get('mode') === 'vault') {
       isVaultMode = true;
       loadVaultDocs();
     } else {
-      loadDirectory('.');
+      loadDirectory(workspacePath);
     }
 
     return () => {
@@ -180,27 +357,38 @@
 
   async function renderMarkdown(content: string) {
     try {
-      // 1. Parse KaTeX Math ($...$ and $$...$$)
+      // 1. Process math blocks ($$...$$ and $...$)
       let processed = content.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
         try {
           return katex.renderToString(math, { displayMode: true, throwOnError: false });
         } catch {
-          return math;
+          return `$$${math}$$`;
         }
       });
       processed = processed.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
         try {
           return katex.renderToString(math, { displayMode: false, throwOnError: false });
         } catch {
-          return math;
+          return `$${math}$`;
         }
       });
 
-      // 2. Parse Marked with custom pro renderer
+      // 2. Parse GFM markdown to sanitized HTML
       const rawHtml = await marked.parse(processed, { gfm: true, breaks: true });
       renderedHtml = DOMPurify.sanitize(rawHtml, {
         ADD_TAGS: ['button', 'span', 'div', 'svg', 'path'],
-        ADD_ATTR: ['data-lang', 'data-code', 'type', 'd', 'stroke', 'fill', 'viewBox', 'stroke-width', 'stroke-linecap', 'stroke-linejoin']
+        ADD_ATTR: [
+          'data-lang',
+          'data-code',
+          'type',
+          'd',
+          'stroke',
+          'fill',
+          'viewBox',
+          'stroke-width',
+          'stroke-linecap',
+          'stroke-linejoin',
+        ],
       });
 
       // 3. Render Mermaid blocks on next tick
@@ -245,12 +433,11 @@
       rawMarkdown = content;
       if (editorView) {
         editorView.dispatch({
-          changes: { from: 0, to: editorView.state.doc.length, insert: content }
+          changes: { from: 0, to: editorView.state.doc.length, insert: content },
         });
       }
       renderMarkdown(content);
 
-      // Expand folder context if needed
       const lastSlash = node.path.lastIndexOf('/');
       if (lastSlash > 0) {
         const parentDir = node.path.substring(0, lastSlash);
@@ -278,45 +465,45 @@
       } catch (e) {
         console.error('Save failed:', e);
       } finally {
-        isSaving = false;
+        setTimeout(() => {
+          isSaving = false;
+        }, 300);
       }
-    }, 500);
+    }, 600);
   }
 
   async function loadVaultDocs() {
     try {
       vaultDocs = await invoke<any[]>('vault_list_documents', { callerProfileId: 'default' });
+      if (vaultDocs.length > 0 && !currentFilePath?.startsWith('vault://')) {
+        openVaultDoc(vaultDocs[0]);
+      }
     } catch (e) {
-      console.warn('Cannot list vault docs:', e);
+      console.warn('Vault list error:', e);
     }
   }
 
   async function openVaultDoc(doc: any) {
     currentFilePath = `vault://${doc.id}`;
     currentDocTitle = `🔒 ${doc.title}`;
-    rawMarkdown = doc.content;
+    rawMarkdown = doc.content || '';
     if (editorView) {
       editorView.dispatch({
-        changes: { from: 0, to: editorView.state.doc.length, insert: doc.content }
+        changes: { from: 0, to: editorView.state.doc.length, insert: rawMarkdown },
       });
     }
-    renderMarkdown(doc.content);
+    renderMarkdown(rawMarkdown);
   }
 
   async function saveVaultDoc() {
-    if (!currentFilePath || !currentFilePath.startsWith('vault://')) return;
+    if (!currentFilePath?.startsWith('vault://')) return;
     const docId = currentFilePath.replace('vault://', '');
+    const title = currentDocTitle.replace(/^🔒\s*/, '');
     try {
       await invoke('vault_save_document', {
-        input: {
-          id: docId,
-          title: currentDocTitle.replace('🔒 ', ''),
-          content: rawMarkdown,
-          tags: []
-        },
-        callerProfileId: 'default'
+        input: { id: docId, title, content: rawMarkdown },
+        callerProfileId: 'default',
       });
-      loadVaultDocs();
     } catch (e) {
       console.error('Failed to save vault doc:', e);
     }
@@ -324,27 +511,23 @@
 
   async function createNewFile() {
     if (isVaultMode) {
-      const docTitle = prompt('Judul dokumen brankas baru:', 'Catatan Baru');
-      if (!docTitle) return;
+      const title = prompt('Judul catatan rahasia di Brankas:', 'Catatan Baru');
+      if (!title) return;
       try {
-        const newDoc = await invoke<any>('vault_save_document', {
-          input: {
-            title: docTitle,
-            content: `# ${docTitle}\n\nCatatan rahasia terenkripsi SQLCipher.\n`,
-            tags: []
-          },
-          callerProfileId: 'default'
+        const newDoc: any = await invoke('vault_save_document', {
+          input: { title, content: '# ' + title + '\n\n' },
+          callerProfileId: 'default',
         });
         await loadVaultDocs();
         openVaultDoc(newDoc);
-        showToast('Dokumen Vault berhasil dibuat!', 'success');
+        showToast(`Catatan vault "${title}" dibuat!`, 'success');
       } catch (e) {
         alert(`Gagal membuat catatan vault: ${e}`);
       }
       return;
     }
 
-    const fileName = prompt('Nama berkas markdown baru (contoh: rencana.md):', 'dokumen_baru.md');
+    const fileName = prompt('Nama berkas baru (contoh: bab1.md):', 'dokumen_baru.md');
     if (!fileName) return;
     const targetPath = workspacePath === '.' ? fileName : `${workspacePath}/${fileName}`;
     try {
@@ -386,7 +569,7 @@
       const res = await invoke<any>('export_document_html', {
         htmlContent: renderedHtml,
         docTitle: currentDocTitle,
-        targetPath
+        targetPath,
       });
       showToast(res.message || 'Ekspor HTML berhasil!', 'success');
     } catch (e) {
@@ -394,11 +577,16 @@
     }
   }
 
+  async function exportPdf() {
+    // Native print dialog (WebView Print -> Save as PDF)
+    window.print();
+  }
+
   async function handlePreviewClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
     if (!target) return;
 
-    // 1. Handle Code Block Copy Button
+    // Handle Code Block Copy Button
     const copyBtn = target.closest('.code-copy-btn') as HTMLButtonElement | null;
     if (copyBtn) {
       const encoded = copyBtn.getAttribute('data-code');
@@ -421,35 +609,35 @@
       return;
     }
 
-    // 2. Interactive GFM Task List Checkboxes
+    // Interactive GFM Task List Checkboxes
     if (target.tagName === 'INPUT' && target.getAttribute('type') === 'checkbox') {
       const checkbox = target as HTMLInputElement;
       const listItem = checkbox.closest('li');
       if (listItem && listItem.textContent) {
         const text = listItem.textContent.trim();
-        if (checkbox.checked) {
-          rawMarkdown = rawMarkdown.replace(`- [ ] ${text}`, `- [x] ${text}`);
-        } else {
-          rawMarkdown = rawMarkdown.replace(`- [x] ${text}`, `- [ ] ${text}`);
+        const checked = checkbox.checked;
+        const targetSearch = checked ? `[ ] ${text}` : `[x] ${text}`;
+        const targetReplace = checked ? `[x] ${text}` : `[ ] ${text}`;
+
+        if (rawMarkdown.includes(targetSearch)) {
+          const updated = rawMarkdown.replace(targetSearch, targetReplace);
+          rawMarkdown = updated;
+          if (editorView) {
+            editorView.dispatch({
+              changes: { from: 0, to: editorView.state.doc.length, insert: updated },
+            });
+          }
+          renderMarkdown(updated);
+          autoSave();
         }
-        if (editorView) {
-          editorView.dispatch({
-            changes: { from: 0, to: editorView.state.doc.length, insert: rawMarkdown }
-          });
-        }
-        autoSave();
       }
     }
   }
 </script>
 
-<svelte:head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
-</svelte:head>
-
-<div class="h-full flex flex-col bg-white dark:bg-[#161616] text-neutral-800 dark:text-neutral-200 overflow-hidden font-sans select-none">
+<div class="h-full flex flex-col bg-white dark:bg-[#161616] text-neutral-800 dark:text-neutral-200 overflow-hidden font-sans select-none relative">
   <!-- Sleek Studio Toolbar Bar (h-12 / 48px) -->
-  <header class="h-12 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-[#121212]/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between z-10 shrink-0">
+  <header class="h-12 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-[#121212]/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between z-10 shrink-0 no-print">
     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
       <!-- Toggle Sidebar Workspace -->
       <button
@@ -490,8 +678,23 @@
       </div>
     </div>
 
-    <!-- View Mode Switcher & HTML Exporter -->
+    <!-- View Mode Switcher, PDF & HTML Exporters -->
     <div class="flex items-center gap-2 shrink-0">
+      <!-- PDF Print Exporter -->
+      <button
+        onclick={exportPdf}
+        class="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/80 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-xs font-medium border border-neutral-300 dark:border-neutral-700/80 transition-colors flex items-center gap-1.5"
+        title="Cetak atau Simpan PDF (Ctrl+P)"
+      >
+        <svg class="w-3.5 h-3.5 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9V2h12v7"></path>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <path d="M6 14h12v8H6z"></path>
+        </svg>
+        <span class="hidden sm:inline">PDF</span>
+      </button>
+
+      <!-- HTML Exporter -->
       <button
         onclick={exportHtml}
         class="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 dark:bg-neutral-800/80 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-xs font-medium border border-neutral-300 dark:border-neutral-700/80 transition-colors flex items-center gap-1.5"
@@ -500,7 +703,7 @@
         <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        <span class="hidden sm:inline">Ekspor HTML</span>
+        <span class="hidden sm:inline">HTML</span>
       </button>
 
       <!-- Editor / Split / Preview View Switcher -->
@@ -528,9 +731,9 @@
   </header>
 
   <!-- Main Multi-Pane Body -->
-  <div class="flex-1 flex overflow-hidden min-h-0">
+  <div class="flex-1 flex overflow-hidden min-h-0 relative">
     <!-- Workspace Files / Vault Explorer Sidebar -->
-    <aside class="{showFileTree ? 'w-60 sm:w-64' : 'hidden'} border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#111111] flex flex-col shrink-0 select-none">
+    <aside class="{showFileTree ? 'w-60 sm:w-64' : 'hidden'} border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#111111] flex flex-col shrink-0 select-none file-tree-sidebar no-print">
       <!-- Mode Switcher Tabs: Files vs Encrypted Vault -->
       <div class="grid grid-cols-2 p-1.5 border-b border-neutral-200 dark:border-neutral-800/80 gap-1 bg-neutral-100/80 dark:bg-neutral-950/60">
         <button
@@ -617,17 +820,46 @@
       </div>
     </aside>
 
-    <!-- Editor Pane (CodeMirror 6) -->
+    <!-- Editor Pane (CodeMirror 6 with Format Toolbar & Zen Mode) -->
     {#if viewMode === 'split' || viewMode === 'editor'}
-      <main class="flex-1 flex flex-col bg-neutral-50 dark:bg-[#0f141c] overflow-hidden {viewMode === 'split' ? 'border-r border-neutral-200 dark:border-neutral-800' : ''}">
-        <div bind:this={editorElement} class="flex-1 overflow-auto font-mono text-sm leading-relaxed p-2"></div>
+      <main
+        class="flex-1 flex flex-col bg-neutral-50 dark:bg-[#0f141c] overflow-hidden relative {viewMode === 'split' ? 'border-r border-neutral-200 dark:border-neutral-800' : ''}"
+      >
+        <!-- Format Toolbar Above Editor -->
+        <MarkdownFormatToolbar
+          {editorView}
+          {isZenMode}
+          onToggleZen={handleToggleZen}
+          onFormatDocumentTable={handleFormatDocumentTable}
+        />
+
+        <!-- CodeMirror Editor Viewport -->
+        <div
+          bind:this={editorElement}
+          class="flex-1 overflow-auto font-mono text-sm leading-relaxed p-2 {isZenMode ? 'max-w-3xl mx-auto w-full pt-12 pb-32' : ''}"
+        ></div>
+
+        <!-- Floating Contextual AI Action Bar on Text Selection -->
+        {#if selectedText.trim().length > 0}
+          <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
+            <ContextualAiActionBar
+              {selectedText}
+              onApplyResult={handleApplyAiResult}
+              onClose={() => {
+                selectedText = '';
+                selectionRange = null;
+              }}
+            />
+          </div>
+        {/if}
       </main>
     {/if}
 
-    <!-- Live Preview Pane with Pro Markdown Styling & Grid Flow Pattern Background -->
-    {#if viewMode === 'split' || viewMode === 'preview'}
+    <!-- Live Preview Pane with Synchronized Scrolling -->
+    {#if (viewMode === 'split' || viewMode === 'preview') && !isZenMode}
       <section
         bind:this={previewElement}
+        onscroll={syncScrollPreviewToEditor}
         onclick={handlePreviewClick}
         class="flex-1 overflow-y-auto bg-white dark:bg-[#0c1017] p-8 sm:p-10 markdown-preview max-w-none select-text bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:56px_56px]"
       >
@@ -637,7 +869,7 @@
   </div>
 
   <!-- Sleek Status Bar in Card Footer -->
-  <footer class="h-7 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-[#111111] px-3 sm:px-4 flex items-center justify-between text-[11px] font-mono text-neutral-500 dark:text-neutral-400 z-10 shrink-0 select-none">
+  <footer class="h-7 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-[#111111] px-3 sm:px-4 flex items-center justify-between text-[11px] font-mono text-neutral-500 dark:text-neutral-400 z-10 shrink-0 select-none no-print">
     <div class="flex items-center gap-3 sm:gap-4 truncate">
       <span>Kata: <strong class="text-neutral-800 dark:text-neutral-200">{wordCount}</strong></span>
       <span class="hidden sm:inline">Karakter: <strong class="text-neutral-800 dark:text-neutral-200">{charCount}</strong></span>

@@ -2007,6 +2007,12 @@
           "markdownDescription": "Enables the ai_chat command without any pre-configured scope."
         },
         {
+          "description": "Enables the ai_copilot_action command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-ai-copilot-action",
+          "markdownDescription": "Enables the ai_copilot_action command without any pre-configured scope."
+        },
+        {
           "description": "Enables the ai_preview_context command without any pre-configured scope.",
           "type": "string",
           "const": "allow-ai-preview-context",
@@ -2041,6 +2047,12 @@
           "type": "string",
           "const": "allow-export-document-html",
           "markdownDescription": "Enables the export_document_html command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the export_document_pdf command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-export-document-pdf",
+          "markdownDescription": "Enables the export_document_pdf command without any pre-configured scope."
         },
         {
           "description": "Enables the export_encrypted_backup command without any pre-configured scope.",
@@ -2101,6 +2113,42 @@
           "type": "string",
           "const": "allow-lock-vault",
           "markdownDescription": "Enables the lock_vault command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_activate_license command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-activate-license",
+          "markdownDescription": "Enables the pro_activate_license command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_login command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-login",
+          "markdownDescription": "Enables the pro_login command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_logout command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-logout",
+          "markdownDescription": "Enables the pro_logout command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_register command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-register",
+          "markdownDescription": "Enables the pro_register command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_server_available command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-server-available",
+          "markdownDescription": "Enables the pro_server_available command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pro_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pro-status",
+          "markdownDescription": "Enables the pro_status command without any pre-configured scope."
         },
         {
           "description": "Enables the reset_vault command without any pre-configured scope.",
@@ -2247,6 +2295,12 @@
           "markdownDescription": "Denies the ai_chat command without any pre-configured scope."
         },
         {
+          "description": "Denies the ai_copilot_action command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-ai-copilot-action",
+          "markdownDescription": "Denies the ai_copilot_action command without any pre-configured scope."
+        },
+        {
           "description": "Denies the ai_preview_context command without any pre-configured scope.",
           "type": "string",
           "const": "deny-ai-preview-context",
@@ -2281,6 +2335,12 @@
           "type": "string",
           "const": "deny-export-document-html",
           "markdownDescription": "Denies the export_document_html command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the export_document_pdf command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-export-document-pdf",
+          "markdownDescription": "Denies the export_document_pdf command without any pre-configured scope."
         },
         {
           "description": "Denies the export_encrypted_backup command without any pre-configured scope.",
@@ -2341,6 +2401,42 @@
           "type": "string",
           "const": "deny-lock-vault",
           "markdownDescription": "Denies the lock_vault command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_activate_license command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-activate-license",
+          "markdownDescription": "Denies the pro_activate_license command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_login command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-login",
+          "markdownDescription": "Denies the pro_login command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_logout command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-logout",
+          "markdownDescription": "Denies the pro_logout command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_register command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-register",
+          "markdownDescription": "Denies the pro_register command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_server_available command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-server-available",
+          "markdownDescription": "Denies the pro_server_available command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pro_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pro-status",
+          "markdownDescription": "Denies the pro_status command without any pre-configured scope."
         },
         {
           "description": "Denies the reset_vault command without any pre-configured scope.",

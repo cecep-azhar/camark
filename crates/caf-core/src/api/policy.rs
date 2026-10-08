@@ -232,6 +232,46 @@ pub const COMMAND_POLICIES: &[CommandPolicy] = &[
         policy: Policy::Public,
         returns_list: false,
     },
+    CommandPolicy {
+        name: "export_document_pdf",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "ai_copilot_action",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_status",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_server_available",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_login",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_register",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_activate_license",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
+        name: "pro_logout",
+        policy: Policy::Public,
+        returns_list: false,
+    },
 ];
 
 pub fn get_command_policy(command_name: &str) -> Option<&'static CommandPolicy> {

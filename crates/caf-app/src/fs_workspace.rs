@@ -148,7 +148,8 @@ fn read_dir_recursive(path: &Path, depth: u8) -> Result<Vec<FileNode>, String> {
             (None, None)
         };
 
-        if is_dir || name.ends_with(".md") || name.ends_with(".txt") || name.ends_with(".markdown") {
+        if is_dir || name.ends_with(".md") || name.ends_with(".txt") || name.ends_with(".markdown")
+        {
             entries.push(FileNode {
                 name,
                 path: p.to_string_lossy().to_string(),
@@ -219,11 +220,13 @@ mod tests {
         assert!(entries.iter().all(|e| e.name != ".git"));
 
         // Verify docs folder is included and has children
-        let docs = entries.iter().find(|e| e.name == "docs").expect("find docs");
+        let docs = entries
+            .iter()
+            .find(|e| e.name == "docs")
+            .expect("find docs");
         assert!(docs.is_dir);
         let children = docs.children.as_ref().expect("docs children");
         assert_eq!(children.len(), 1);
         assert_eq!(children[0].name, "test.md");
     }
 }
-

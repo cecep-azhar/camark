@@ -1,7 +1,7 @@
 <script lang="ts">
   import { t } from '$lib/i18n/index.svelte';
   import Logo from './Logo.svelte';
-  import { APP_VERSION, REPO_URL, WEBSITE_URL, AUTHOR_URL } from '$lib/appInfo';
+  import { APP_VERSION, REPO_URL, WEBSITE_URL, AUTHOR_NAME, AUTHOR_URL, CONTACT_EMAIL, INCUBATOR_NAME } from '$lib/appInfo';
 
   let { onClose }: { onClose: () => void } = $props();
 </script>
@@ -62,7 +62,7 @@
       <div class="flex justify-between py-2">
         <dt class="text-neutral-500">{t('about.builtBy')}</dt>
         <dd>
-          <a href={AUTHOR_URL} target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline font-medium">Cecep Azhar</a>
+          <a href={AUTHOR_URL} target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline font-medium">{AUTHOR_NAME}</a>
         </dd>
       </div>
     </dl>
@@ -82,7 +82,7 @@
 
     <div class="mt-4 text-[11px] text-neutral-500 dark:text-neutral-400 flex flex-col items-center justify-center gap-1">
       <div>
-        {t('about.copyright')} <a href={AUTHOR_URL} target="_blank" rel="noreferrer" class="text-neutral-700 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-sky-400 hover:underline font-medium">Cecep Azhar</a>
+        {t('about.copyright')} <a href={AUTHOR_URL} target="_blank" rel="noreferrer" class="text-neutral-700 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-sky-400 hover:underline font-medium">{AUTHOR_NAME}</a>
       </div>
       <div class="flex items-center gap-1.5 text-neutral-400 dark:text-neutral-500">
         <span>{t('about.builtWithLove')}</span>

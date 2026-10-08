@@ -349,7 +349,7 @@ export const id: Dictionary = {
       license: 'Lisensi',
       licenseVal: 'MIT (dengan CATerm Attribution Notice)',
       author: 'Pengembang',
-      authorVal: 'Cecep Azhar (Fathforce)'
+      authorVal: 'Cecep Saeful Azhar Hidayat, ST (Fathforce)'
     }
   },
   ambient: {

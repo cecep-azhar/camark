@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-ai-copilot-action"
+description = "Enables the ai_copilot_action command without any pre-configured scope."
+commands.allow = ["ai_copilot_action"]
+
+[[permission]]
+identifier = "deny-ai-copilot-action"
+description = "Denies the ai_copilot_action command without any pre-configured scope."
+commands.deny = ["ai_copilot_action"]

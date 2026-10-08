@@ -4,10 +4,15 @@
 import { version } from '../../package.json';
 
 export const APP_VERSION: string = version;
-export const REPO_URL = '';
-export const WEBSITE_URL = '';
-export const AUTHOR_URL = '';
-export const PRICING_URL = '';
+export const REPO_URL = 'https://github.com/cecep-azhar/camark';
+export const WEBSITE_URL = 'https://www.cecepazhar.com';
+export const AUTHOR_NAME = 'Cecep Saeful Azhar Hidayat, ST';
+export const AUTHOR_URL = 'https://www.cecepazhar.com';
+export const CONTACT_EMAIL = 'hi@cecepazhar.com';
+export const CONTACT_PHONE = '0852 2069 6117';
+export const INCUBATOR_NAME = 'Fathforce';
+export const INCUBATOR_URL = 'https://fathforce.com';
+export const PRICING_URL = 'https://www.cecepazhar.com/#pricing';
 export const GITHUB_SPONSORS_URL = '';
 export const KOFI_URL = '';
 export const PAYPAL_URL = '';

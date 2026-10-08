@@ -40,7 +40,8 @@ pub fn open_encrypted(data_dir: &Path, passphrase: &str) -> Result<Connection, C
         Ok(conn) => Ok(conn),
         Err(e) => {
             if db_path.exists() {
-                let backup_path = data_dir.join(format!("camark.db.bak.{}", chrono::Utc::now().timestamp()));
+                let backup_path =
+                    data_dir.join(format!("camark.db.bak.{}", chrono::Utc::now().timestamp()));
                 let _ = std::fs::rename(&db_path, &backup_path);
                 let _ = std::fs::remove_file(data_dir.join("camark.db-wal"));
                 let _ = std::fs::remove_file(data_dir.join("camark.db-shm"));

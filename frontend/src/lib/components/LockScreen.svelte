@@ -403,10 +403,16 @@
       </div>
     </div>
 
-    <!-- Left Panel Footer -->
-    <div class="relative z-10 flex items-center justify-between text-xs text-neutral-500">
-      <span>{t('lock.zkIdentity')}</span>
-      <span class="font-mono text-neutral-400 dark:text-neutral-600">v{APP_VERSION}</span>
+    <!-- Lock Screen Footer with Full Branding -->
+    <div class="relative z-10 flex flex-col gap-1 text-xs text-neutral-500">
+      <div class="flex items-center justify-between">
+        <span>{t('lock.zkIdentity')}</span>
+        <span class="font-mono text-neutral-400 dark:text-neutral-600">v{APP_VERSION}</span>
+      </div>
+      <div class="flex items-center justify-between text-[11px] text-neutral-400 dark:text-neutral-500 pt-1 border-t border-neutral-100 dark:border-neutral-900">
+        <span>Cecep Saeful Azhar Hidayat, ST · <a href="https://www.cecepazhar.com" target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline">cecepazhar.com</a></span>
+        <span>Incubated at <a href="https://fathforce.com" target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline">Fathforce</a></span>
+      </div>
     </div>
   </div>
 

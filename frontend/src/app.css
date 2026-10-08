@@ -342,3 +342,72 @@ html.dark {
   font-size: 1.05em;
   color: #e0f2fe;
 }
+
+/* Native Print & PDF Export Styling */
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 15mm;
+  }
+
+  /* Hide app shell chrome during print */
+  header,
+  aside,
+  .no-print,
+  .markdown-format-toolbar,
+  .context-ai-bar,
+  .code-copy-btn,
+  .file-tree-sidebar,
+  button {
+    display: none !important;
+  }
+
+  body,
+  html {
+    background: #ffffff !important;
+    color: #111827 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+
+  .markdown-preview {
+    max-width: 100% !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .markdown-preview h1,
+  .markdown-preview h2,
+  .markdown-preview h3,
+  .markdown-preview h4 {
+    color: #000000 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .markdown-preview table,
+  .markdown-preview pre,
+  .markdown-preview blockquote {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .markdown-preview td,
+  .markdown-preview th {
+    color: #111827 !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  .code-block-wrapper {
+    border: 1px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+  }
+
+  .code-block-wrapper pre code {
+    color: #0f172a !important;
+    background: #f8fafc !important;
+  }
+}
+
