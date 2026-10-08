@@ -82,6 +82,15 @@ pub async fn rename_file(old_path: String, new_path: String) -> Result<(), Strin
     .map_err(|e| e.to_string())?
 }
 
+pub async fn create_directory(dir_path: String) -> Result<(), String> {
+    tokio::task::spawn_blocking(move || {
+        let path = Path::new(&dir_path);
+        fs::create_dir_all(path).map_err(|e| format!("Failed to create directory: {e}"))
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 pub async fn delete_file(file_path: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || {
         let path = Path::new(&file_path);
@@ -94,6 +103,19 @@ pub async fn delete_file(file_path: String) -> Result<(), String> {
     .await
     .map_err(|e| e.to_string())?
 }
+
+const IGNORED_DIRS: &[&str] = &[
+    "node_modules",
+    "target",
+    "venv",
+    ".venv",
+    "env",
+    ".git",
+    "dist",
+    "build",
+    ".cache",
+    "__pycache__",
+];
 
 fn read_dir_recursive(path: &Path, depth: u8) -> Result<Vec<FileNode>, String> {
     if depth == 0 {
@@ -111,6 +133,9 @@ fn read_dir_recursive(path: &Path, depth: u8) -> Result<Vec<FileNode>, String> {
         }
 
         let is_dir = p.is_dir();
+        if is_dir && IGNORED_DIRS.contains(&name.as_str()) {
+            continue;
+        }
         let (size_bytes, modified_at) = if let Ok(meta) = p.metadata() {
             let size = if is_dir { None } else { Some(meta.len()) };
             let mod_time = meta
@@ -151,3 +176,54 @@ fn read_dir_recursive(path: &Path, depth: u8) -> Result<Vec<FileNode>, String> {
 
     Ok(entries)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_create_directory_and_filter_ignored() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let temp_path = temp.path();
+
+        let sub_folder = temp_path.join("docs");
+        create_directory(sub_folder.to_string_lossy().to_string())
+            .await
+            .expect("create docs dir");
+
+        let node_modules = temp_path.join("node_modules");
+        create_directory(node_modules.to_string_lossy().to_string())
+            .await
+            .expect("create node_modules dir");
+
+        let target_dir = temp_path.join("target");
+        create_directory(target_dir.to_string_lossy().to_string())
+            .await
+            .expect("create target dir");
+
+        let git_dir = temp_path.join(".git");
+        create_directory(git_dir.to_string_lossy().to_string())
+            .await
+            .expect("create .git dir");
+
+        let sample_file = sub_folder.join("test.md");
+        fs::write(&sample_file, "# Hello").expect("write md");
+
+        let entries = list_dir(temp_path.to_string_lossy().to_string())
+            .await
+            .expect("list dir");
+
+        // Verify node_modules, target, .git are excluded
+        assert!(entries.iter().all(|e| e.name != "node_modules"));
+        assert!(entries.iter().all(|e| e.name != "target"));
+        assert!(entries.iter().all(|e| e.name != ".git"));
+
+        // Verify docs folder is included and has children
+        let docs = entries.iter().find(|e| e.name == "docs").expect("find docs");
+        assert!(docs.is_dir);
+        let children = docs.children.as_ref().expect("docs children");
+        assert_eq!(children.len(), 1);
+        assert_eq!(children[0].name, "test.md");
+    }
+}
+

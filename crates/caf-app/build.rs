@@ -48,6 +48,7 @@ const COMMANDS: &[&str] = &[
     "workspace_read_file",
     "workspace_write_file",
     "workspace_create_file",
+    "workspace_create_directory",
     "workspace_rename_file",
     "workspace_delete_file",
     "get_initial_file_path",

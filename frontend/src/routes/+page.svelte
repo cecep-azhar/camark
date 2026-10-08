@@ -14,20 +14,19 @@
   import { t } from '$lib/i18n/index.svelte';
   import { page } from '$app/state';
 
-  interface FileNode {
-    name: string;
-    path: string;
-    is_dir: boolean;
-    children?: FileNode[];
-    size_bytes?: number;
-    modified_at?: number;
-  }
+  import FileTreeNode from '$lib/components/FileTreeNode.svelte';
+  import type { FileNode } from '$lib/types/fileTree';
 
   // State
   const layoutState = getLayoutState();
   let workspacePath = $state<string>('.');
   let fileTree = $state<FileNode[]>([]);
-  let showFileTree = $state<boolean>(true);
+  let expandedDirs = $state<Set<string>>(new Set());
+  let showFileTree = $state<boolean>(
+    typeof localStorage !== 'undefined'
+      ? localStorage.getItem('camark_show_file_tree') !== 'false'
+      : true
+  );
   let currentFilePath = $state<string | null>(null);
   let isVaultMode = $state<boolean>(false);
   let vaultDocs = $state<any[]>([]);
@@ -85,7 +84,32 @@
 
   marked.use({ renderer: proRenderer });
 
+  function toggleFileTree() {
+    showFileTree = !showFileTree;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('camark_show_file_tree', String(showFileTree));
+    }
+  }
+
+  function toggleDir(path: string) {
+    const next = new Set(expandedDirs);
+    if (next.has(path)) {
+      next.delete(path);
+    } else {
+      next.add(path);
+    }
+    expandedDirs = next;
+  }
+
   onMount(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        toggleFileTree();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
     mermaid.initialize({
       startOnLoad: false,
       theme: 'dark',
@@ -148,6 +172,10 @@
     } else {
       loadDirectory('.');
     }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   });
 
   async function renderMarkdown(content: string) {
@@ -329,6 +357,26 @@
     }
   }
 
+  async function createNewDirectory() {
+    if (isVaultMode) {
+      showToast('Pembuatan direktori hanya didukung pada mode Files', 'info');
+      return;
+    }
+    const dirName = prompt('Nama folder/direktori baru (contoh: bab1):', 'folder_baru');
+    if (!dirName) return;
+    const targetPath = workspacePath === '.' ? dirName : `${workspacePath}/${dirName}`;
+    try {
+      await invoke('workspace_create_directory', { dirPath: targetPath });
+      await loadDirectory(workspacePath);
+      const next = new Set(expandedDirs);
+      next.add(targetPath);
+      expandedDirs = next;
+      showToast(`Folder ${dirName} berhasil dibuat!`, 'success');
+    } catch (e) {
+      alert(`Gagal membuat folder: ${e}`);
+    }
+  }
+
   async function exportHtml() {
     const defaultName = currentDocTitle.replace(/\.md$/, '.html').replace('🔒 ', '');
     const targetPath = prompt('Simpan HTML sebagai:', `/tmp/${defaultName}`);
@@ -417,9 +465,9 @@
 
       <!-- Toggle Files / Vault Explorer Rail -->
       <button
-        onclick={() => (showFileTree = !showFileTree)}
+        onclick={toggleFileTree}
         class="p-1.5 rounded-lg transition-colors {showFileTree ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-200/70 dark:hover:bg-neutral-800'}"
-        title={showFileTree ? "Sembunyikan Panel Berkas" : "Tampilkan Panel Berkas"}
+        title={showFileTree ? "Sembunyikan Panel Berkas (Ctrl+B)" : "Tampilkan Panel Berkas (Ctrl+B)"}
         aria-label="Toggle Files Explorer Rail"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -499,21 +547,35 @@
         </button>
       </div>
 
-      <!-- Action Sub-header: Title & New File/Doc Button -->
+      <!-- Action Sub-header: Title & New File/Folder Buttons -->
       <div class="p-2.5 px-3 border-b border-neutral-200 dark:border-neutral-800/80 flex items-center justify-between">
         <span class="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
           {isVaultMode ? 'Catatan Vault' : 'Berkas & Folder'}
         </span>
-        <button
-          onclick={createNewFile}
-          class="p-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 {isVaultMode ? 'text-amber-600 dark:text-amber-400' : 'text-cyan-600 dark:text-cyan-400'} transition-colors"
-          title={isVaultMode ? 'Buat Catatan Vault Baru' : 'Buat Berkas Markdown Baru'}
-          aria-label="Create New File"
-        >
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
+        <div class="flex items-center gap-1">
+          {#if !isVaultMode}
+            <button
+              onclick={createNewDirectory}
+              class="p-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 text-amber-600 dark:text-amber-400 transition-colors"
+              title="Buat Folder Baru"
+              aria-label="Create New Folder"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>
+            </button>
+          {/if}
+          <button
+            onclick={createNewFile}
+            class="p-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 {isVaultMode ? 'text-amber-600 dark:text-amber-400' : 'text-cyan-600 dark:text-cyan-400'} transition-colors"
+            title={isVaultMode ? 'Buat Catatan Vault Baru' : 'Buat Berkas Markdown Baru'}
+            aria-label="Create New File"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Scrollable File / Vault Tree -->
@@ -537,22 +599,20 @@
           {/if}
         {:else}
           {#each fileTree as node (node.path)}
-            <button
-              onclick={() => openFile(node)}
-              class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors {currentFilePath === node.path ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 font-medium' : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 hover:text-neutral-900 dark:hover:text-white'}"
-            >
-              {#if node.is_dir}
-                <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-                </svg>
-              {:else}
-                <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              {/if}
-              <span class="truncate">{node.name}</span>
-            </button>
+            <FileTreeNode
+              {node}
+              depth={0}
+              {currentFilePath}
+              {expandedDirs}
+              onOpenFile={openFile}
+              onToggleDir={toggleDir}
+            />
           {/each}
+          {#if fileTree.length === 0}
+            <div class="p-4 text-center text-neutral-400 dark:text-neutral-500 text-[11px]">
+              Tidak ada berkas markdown ditemukan.
+            </div>
+          {/if}
         {/if}
       </div>
     </aside>

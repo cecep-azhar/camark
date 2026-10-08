@@ -533,7 +533,7 @@ pub mod tests {
         let _key = crate::vault::ensure_unlocked_key().expect("vault key");
 
         let initial = get_settings().expect("default settings");
-        assert_eq!(initial.mode, AiMode::Off);
+        assert_eq!(initial.mode, AiMode::Byo);
         assert!(!initial.has_api_key);
 
         let mut custom = initial;
@@ -628,6 +628,10 @@ pub mod tests {
     fn test_mode_off_returns_disabled() {
         let _guard = crate::test_support::isolated_data_dir("ai_mode_off_test");
         let _key = crate::vault::ensure_unlocked_key().expect("vault key");
+
+        let mut current = get_settings().expect("settings");
+        current.mode = AiMode::Off;
+        save_settings(&current).expect("save off");
 
         let session = crate::session::Session::new("prof-1", "member");
 

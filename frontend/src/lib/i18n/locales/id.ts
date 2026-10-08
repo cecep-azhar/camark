@@ -251,17 +251,106 @@ export const id: Dictionary = {
   },
   settings: {
     title: 'Pengaturan',
-    general: 'Umum',
-    appearance: 'Tampilan',
-    theme: 'Tema',
-    themes: {
-      system: 'Sistem',
-      dark: 'Gelap',
-      light: 'Terang'
+    subtitle: 'Konfigurasi keamanan brankas, aura ambient, AI copilot, profil keluarga, dan pencadangan terenkripsi.',
+    tabs: {
+      profile: 'Profil',
+      security: 'Keamanan & Brankas',
+      appearance: 'Tampilan & Ambient',
+      profiles: 'Profil Keluarga',
+      ai: 'Asisten AI',
+      backup: 'Cadangkan & Pulihkan',
+      about: 'Tentang CAMark'
     },
-    language: 'Bahasa',
-    security: 'Keamanan & Profil',
-    ai: 'Asisten AI'
+    profile: {
+      title: 'Pengaturan Profil',
+      localNote: 'Profil lokal — hanya tersimpan di perangkat ini, tanpa pelacakan cloud.',
+      displayName: 'Nama tampilan',
+      picture: 'Foto profil',
+      save: 'Simpan profil',
+      saved: 'Profil berhasil diperbarui.',
+      masterPassword: 'Kata Sandi Utama',
+      masterPasswordBody: 'Mengamankan dan mengenkripsi brankas SQLCipher lokal Anda.',
+      changeMasterPassword: 'Ganti Kata Sandi Utama'
+    },
+    security: {
+      title: 'Kata Sandi Utama & Kunci Ulang Brankas',
+      subtitle: 'Mengubah kunci zero-knowledge Argon2id yang melindungi database SQLCipher Anda.',
+      rekeyNote: 'Mengganti kata sandi utama akan mengenkripsi ulang seluruh database. Harap biarkan aplikasi tetap terbuka sampai selesai.',
+      current: 'Kata Sandi Saat Ini',
+      new: 'Kata Sandi Baru (min. {min} karakter)',
+      confirm: 'Konfirmasi Kata Sandi Baru',
+      showPasswords: 'Tampilkan kata sandi',
+      updating: 'Memperbarui kunci master...',
+      updateButton: 'Perbarui Kata Sandi Utama',
+      errMin: 'Kata sandi utama baru harus memiliki minimal {min} karakter.',
+      errMismatch: 'Kata sandi baru dan konfirmasi tidak cocok.',
+      changedTitle: 'Kata Sandi Utama Berubah',
+      changedConfirm: 'Kata sandi utama berhasil diperbarui dan brankas telah dienkripsi ulang. Mulai ulang CAMark sekarang untuk memuat ulang sesi?',
+      changedToast: 'Kata sandi utama berhasil diperbarui.',
+      restartNow: 'Mulai Ulang Sekarang',
+      later: 'Nanti'
+    },
+    appearance: {
+      title: 'Tampilan & Aura Ambient',
+      subtitle: 'Konfigurasi pencahayaan ambient, pendaran tepi kartu, dan aksen tema gelap/terang.'
+    },
+    profilesTab: {
+      title: 'Profil Keluarga & Kontrol Akses',
+      subtitle: 'Dukungan multi-profil dengan kunci PIN individu dan peran keluarga.',
+      addMember: 'Tambah Anggota',
+      newProfileTitle: 'Profil Keluarga Baru',
+      namePlaceholder: 'Nama Profil (cth. Fatih)',
+      pinPlaceholder: 'PIN 4-6 Digit Opsional',
+      pinSet: 'PIN Terpasang',
+      noPin: 'Tanpa PIN',
+      saveProfile: 'Simpan Profil',
+      nameRequired: 'Nama profil wajib diisi',
+      addedToast: 'Profil berhasil ditambahkan'
+    },
+    ai: {
+      title: 'Asisten AI & Privasi LLM',
+      subtitle: 'Gunakan API key sendiri (BYO), endpoint Ollama lokal, dan penyamaran privasi cerdas.',
+      provider: 'Penyedia Layanan',
+      endpoint: 'URL Endpoint',
+      apiKey: 'Kunci API',
+      model: 'Model',
+      privacyMode: 'Mode Privasi (Ringkasan Teranonimkan)',
+      privacyModeBody: 'Menyunting data pribadi sensitif dan menyamarkan informasi akun sebelum mengirim prompt ke AI.',
+      saveButton: 'Simpan Konfigurasi AI',
+      saving: 'Menyimpan...',
+      savedToast: 'Pengaturan AI berhasil disimpan.'
+    },
+    backup: {
+      title: 'Cadangkan & Pulihkan Brankas Terenkripsi',
+      subtitle: 'Ekspor atau pulihkan payload brankas terenkripsi secara aman (.cafbackup).',
+      exportTitle: 'Ekspor Cadangan Terenkripsi',
+      exportBody: 'Membuat arsip terenkripsi catatan, brankas, dan preferensi yang dilindungi passphrase Argon2id.',
+      exportPassphrase: 'Passphrase Enkripsi Cadangan (min. 8 karakter)',
+      exportButton: 'Ekspor Cadangan Terenkripsi',
+      exporting: 'Mengekspor cadangan terenkripsi...',
+      exportSuccess: 'Cadangan berhasil diekspor (.cafbackup)',
+      restoreTitle: 'Pulihkan Cadangan Terenkripsi',
+      restoreBody: 'Pilih arsip berkas .cafbackup dan masukkan passphrase untuk mendekripsi dan menggabungkan data Anda.',
+      restorePassphrase: 'Passphrase Dekripsi Cadangan',
+      restoreButton: 'Pulihkan dari Berkas .cafbackup',
+      restoreSelectFile: 'Pilih Berkas & Pulihkan',
+      restoring: 'Mendekripsi dan mengimpor cadangan...',
+      restoreSuccess: 'Cadangan berhasil dipulihkan',
+      hidePassphrase: 'Sembunyikan passphrase',
+      showPassphrase: 'Tampilkan passphrase',
+      errPassphraseMin: 'Passphrase harus minimal 8 karakter'
+    },
+    about: {
+      title: 'Tentang CAMark',
+      subtitle: 'Kerangka kerja starter open-source untuk aplikasi desktop & mobile yang mengutamakan privasi.',
+      version: 'Versi Kerangka Kerja',
+      stack: 'Tumpukan Arsitektur',
+      stackVal: 'Tauri 2 + Rust Edition 2024 + Svelte 5 + SQLCipher',
+      license: 'Lisensi',
+      licenseVal: 'MIT (dengan CATerm Attribution Notice)',
+      author: 'Pengembang',
+      authorVal: 'Cecep Azhar (Fathforce)'
+    }
   },
   ambient: {
     title: 'Pencahayaan Ambient & Aura (PRO)',

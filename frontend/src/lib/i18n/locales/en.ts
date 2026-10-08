@@ -253,17 +253,106 @@ export const en: Dictionary = {
   },
   settings: {
     title: 'Settings',
-    general: 'General',
-    appearance: 'Appearance',
-    theme: 'Theme',
-    themes: {
-      system: 'System',
-      dark: 'Dark',
-      light: 'Light'
+    subtitle: 'Configure vault security, ambient aura, AI copilot, family profiles, and encrypted backups.',
+    tabs: {
+      profile: 'Profile',
+      security: 'Security & Vault',
+      appearance: 'Appearance & Ambient',
+      profiles: 'Family Profiles',
+      ai: 'AI Assistant',
+      backup: 'Backup & Restore',
+      about: 'About CAMark'
     },
-    language: 'Language',
-    security: 'Security & Profiles',
-    ai: 'AI Assistant'
+    profile: {
+      title: 'Profile Settings',
+      localNote: 'Local profile — stored on this device only, zero cloud tracking.',
+      displayName: 'Display name',
+      picture: 'Profile picture',
+      save: 'Save profile',
+      saved: 'Profile updated successfully.',
+      masterPassword: 'Master Password',
+      masterPasswordBody: 'Secures and encrypts your local SQLCipher vault.',
+      changeMasterPassword: 'Change Master Password'
+    },
+    security: {
+      title: 'Master Password & Vault Rekey',
+      subtitle: 'Changes the zero-knowledge Argon2id key protecting your SQLCipher database.',
+      rekeyNote: 'Changing your master password re-encrypts all database pages. Please keep the app open until it completes.',
+      current: 'Current Password',
+      new: 'New Password (min. {min} chars)',
+      confirm: 'Confirm New Password',
+      showPasswords: 'Show passwords',
+      updating: 'Updating master key...',
+      updateButton: 'Update Master Password',
+      errMin: 'New master password must be at least {min} characters.',
+      errMismatch: 'New password and confirmation do not match.',
+      changedTitle: 'Master Password Changed',
+      changedConfirm: 'Master password updated and vault re-keyed. Restart CAMark now to reload the session?',
+      changedToast: 'Master password updated successfully.',
+      restartNow: 'Restart Now',
+      later: 'Later'
+    },
+    appearance: {
+      title: 'Appearance & Ambient Aura',
+      subtitle: 'Configure ambient lighting, border glows, and dark/light mode accents.'
+    },
+    profilesTab: {
+      title: 'Family Profiles & Access Control',
+      subtitle: 'Multi-profile support with individual PIN lock and parental roles.',
+      addMember: 'Add Member',
+      newProfileTitle: 'New Family Profile',
+      namePlaceholder: 'Profile Name (e.g. Fatih)',
+      pinPlaceholder: 'Optional 4-6 Digit PIN',
+      pinSet: 'PIN Set',
+      noPin: 'No PIN',
+      saveProfile: 'Save Profile',
+      nameRequired: 'Profile name is required',
+      addedToast: 'Profile added successfully'
+    },
+    ai: {
+      title: 'AI Assistant & LLM Privacy',
+      subtitle: 'Bring Your Own (BYO) API keys, local Ollama endpoints, and privacy-first masking.',
+      provider: 'Provider',
+      endpoint: 'Endpoint URL',
+      apiKey: 'API Key',
+      model: 'Model',
+      privacyMode: 'Privacy-First Mode (Anonymised Summary)',
+      privacyModeBody: 'Redacts personal identifiable info and masks account details before sending prompts to the AI provider.',
+      saveButton: 'Save AI Configuration',
+      saving: 'Saving...',
+      savedToast: 'AI settings saved successfully.'
+    },
+    backup: {
+      title: 'Encrypted Vault Backup & Restore',
+      subtitle: 'Export or restore your full encrypted vault payload safely (.cafbackup).',
+      exportTitle: 'Export Encrypted Backup',
+      exportBody: 'Creates an encrypted archive of your notes, vaults, and preferences protected with Argon2id passphrase.',
+      exportPassphrase: 'Backup Encryption Passphrase (min. 8 chars)',
+      exportButton: 'Export Encrypted Backup',
+      exporting: 'Exporting encrypted backup...',
+      exportSuccess: 'Backup exported successfully (.cafbackup)',
+      restoreTitle: 'Restore Encrypted Backup',
+      restoreBody: 'Select a .cafbackup archive and enter the passphrase to decrypt and merge your records.',
+      restorePassphrase: 'Backup Decryption Passphrase',
+      restoreButton: 'Restore from .cafbackup File',
+      restoreSelectFile: 'Select File & Restore',
+      restoring: 'Decrypting and importing backup...',
+      restoreSuccess: 'Backup restored successfully',
+      hidePassphrase: 'Hide passphrase',
+      showPassphrase: 'Show passphrase',
+      errPassphraseMin: 'Passphrase must be at least 8 characters'
+    },
+    about: {
+      title: 'About CAMark',
+      subtitle: 'Open-source starter framework for privacy-first desktop & mobile apps.',
+      version: 'Framework Version',
+      stack: 'Architecture Stack',
+      stackVal: 'Tauri 2 + Rust Edition 2024 + Svelte 5 + SQLCipher',
+      license: 'License',
+      licenseVal: 'MIT (with CATerm Attribution Notice)',
+      author: 'Author',
+      authorVal: 'Cecep Azhar (Fathforce)'
+    }
   },
   ambient: {
     title: 'Ambient Lighting & Aura (PRO)',

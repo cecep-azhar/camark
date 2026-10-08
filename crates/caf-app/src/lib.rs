@@ -224,6 +224,7 @@ pub fn run_with_start(start: std::time::Instant) {
             commands::workspace_read_file,
             commands::workspace_write_file,
             commands::workspace_create_file,
+            commands::workspace_create_directory,
             commands::workspace_rename_file,
             commands::workspace_delete_file,
             commands::get_initial_file_path,

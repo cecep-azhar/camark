@@ -191,6 +191,11 @@ pub const COMMAND_POLICIES: &[CommandPolicy] = &[
         returns_list: false,
     },
     CommandPolicy {
+        name: "workspace_create_directory",
+        policy: Policy::Public,
+        returns_list: false,
+    },
+    CommandPolicy {
         name: "workspace_rename_file",
         policy: Policy::Public,
         returns_list: false,

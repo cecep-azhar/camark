@@ -239,6 +239,11 @@ pub async fn workspace_create_file(file_path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn workspace_create_directory(dir_path: String) -> Result<(), String> {
+    fs_workspace::create_directory(dir_path).await
+}
+
+#[tauri::command]
 pub async fn workspace_rename_file(old_path: String, new_path: String) -> Result<(), String> {
     fs_workspace::rename_file(old_path, new_path).await
 }

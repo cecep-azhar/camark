@@ -39,6 +39,7 @@
     "allow-workspace-read-file",
     "allow-workspace-write-file",
     "allow-workspace-create-file",
+    "allow-workspace-create-directory",
     "allow-workspace-rename-file",
     "allow-workspace-delete-file",
     "allow-get-initial-file-path",
