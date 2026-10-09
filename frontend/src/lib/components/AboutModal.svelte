@@ -56,7 +56,7 @@
       <div class="flex justify-between py-2">
         <dt class="text-neutral-500">{t('about.source')}</dt>
         <dd>
-          <a href={REPO_URL} target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline font-mono">cecep-azhar/camark</a>
+          <a href={REPO_URL} target="_blank" rel="noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline font-mono">cecepazhar/camark</a>
         </dd>
       </div>
       <div class="flex justify-between py-2">

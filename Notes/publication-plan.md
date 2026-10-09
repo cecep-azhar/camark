@@ -14,7 +14,7 @@ Create a separate private repository `camark-notes` to archive the audit trails 
 git clone /home/cecepazhar/Project/camark /tmp/caf-notes-export
 cd /tmp/caf-notes-export
 git filter-repo --path Notes/ --path-rename Notes/:
-git remote add origin git@github.com:cecep-azhar/camark-notes.git
+git remote add origin git@github.com:cecepazhar/camark-notes.git
 git push -u origin main --force
 ```
 
@@ -36,6 +36,6 @@ git log --all -- build/bin/caterm
 
 ### Step 4: Push to Public Remote
 ```bash
-git remote set-url origin git@github.com:cecep-azhar/camark.git
+git remote set-url origin git@github.com:cecepazhar/camark.git
 git push origin main --force
 ```

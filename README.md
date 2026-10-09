@@ -1,6 +1,6 @@
 # CAMark — High-Performance Zero-Knowledge Markdown Studio
 
-[![Release](https://img.shields.io/badge/release-v0.1.3-06b6d4.svg)](https://github.com/cecep-azhar/camark)
+[![Release](https://img.shields.io/badge/release-v0.1.3-06b6d4.svg)](https://github.com/cecepazhar/camark)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Linux%20|%20Windows%20|%20macOS%20|%20Android-green.svg)]()
 [![CADS](https://img.shields.io/badge/CADS-v1.0%20Compliant-purple.svg)]()

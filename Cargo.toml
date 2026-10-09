@@ -14,7 +14,7 @@ edition = "2024"
 rust-version = "1.98"
 authors = ["Cecep Saeful Azhar Hidayat, ST <hi@cecepazhar.com>"]
 license = "MIT"
-repository = "https://github.com/cecep-azhar/camark"
+repository = "https://github.com/cecepazhar/camark"
 
 [workspace.dependencies]
 cargo-tarpaulin = "0.28"

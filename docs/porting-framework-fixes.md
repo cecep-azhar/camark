@@ -5,7 +5,7 @@ This guide covers how upstream improvements, security updates, and schema migrat
 ## 1. Upstream Git Remote Strategy
 Add the framework repository as an upstream remote:
 ```bash
-git remote add upstream https://github.com/cecep-azhar/camark.git
+git remote add upstream https://github.com/cecepazhar/camark.git
 git fetch upstream
 ```
 
